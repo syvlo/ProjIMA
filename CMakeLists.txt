@@ -6,7 +6,13 @@ set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -g -ggdb" )
 set ( SRC_DIR "src" )
 set ( BIN_DIR "bin" )
 
+find_package( OpenCV REQUIRED )
+
 add_executable(${BIN_DIR}/Denoise
   ${SRC_DIR}/main.cc
   ${SRC_DIR}/Args.cc
+)
+
+target_link_libraries (${BIN_DIR}/Denoise
+  ${OpenCV_LIBS}
 )
