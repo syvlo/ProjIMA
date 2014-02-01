@@ -8,4 +8,5 @@ set ( BIN_DIR "bin" )
 
 add_executable(${BIN_DIR}/Denoise
   ${SRC_DIR}/main.cc
+  ${SRC_DIR}/Args.cc
 )
