@@ -11,6 +11,7 @@ find_package( OpenCV REQUIRED )
 add_executable(${BIN_DIR}/Denoise
   ${SRC_DIR}/main.cc
   ${SRC_DIR}/Args.cc
+  ${SRC_DIR}/TVL0DecompositionMinimizer.cc
 )
 
 target_link_libraries (${BIN_DIR}/Denoise
