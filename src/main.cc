@@ -18,7 +18,13 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    TVL0DecompositionMinimizer minimizer(args.getBetaBV(), args.getBetaS());
+    //FIX ME
+    double alpha_tmp[] = {0, 1, 2, 3};
+    std::vector<double> alpha (alpha_tmp, alpha_tmp + sizeof(alpha_tmp) / sizeof(alpha_tmp));
+    double gamma_tmp[] = {0, 1, 2};
+    std::vector<double> gamma (gamma_tmp, gamma_tmp + sizeof(gamma_tmp) / sizeof(gamma_tmp));
+
+    TVL0DecompositionMinimizer minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {

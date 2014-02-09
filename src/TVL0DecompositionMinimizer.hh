@@ -10,7 +10,7 @@
 
 
 # include <cv.h>
-
+# include <vector>
 
 /**
  * \class TVL0DecompositionMinimizer
@@ -22,15 +22,19 @@ public:
     /**
      * \brief		Default constructor.
      * \details		Will use default values for betas.
+     * \param		alpha Look-up table for the values of alpha_i.
+     * \param		gamma Look-up table for the values of gamma_i.
      */
-    TVL0DecompositionMinimizer();
+    TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma);
 
     /**
      * \brief		Constructor.
+     * \param		alpha Look-up table for the values of alpha_i.
+     * \param		gamma Look-up table for the values of gamma_i.
      * \param		BetaBV	Value for BetaBV.
      * \param		BetaS	Value for BetaS.
      */
-    TVL0DecompositionMinimizer(double BetaBV, double BetaS);
+    TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS);
 
     /**
      * \brief		Destructor.
@@ -81,6 +85,16 @@ private:
     double BetaS_;
 
     /**
+     * look-up table for alpha_i values, i.e. possible values for BV image.
+     */
+    const std::vector<double> Alpha_;
+
+    /**
+     * look-up table for gamma_i values, i.e. possible values for S image.
+     */
+    const std::vector<double> Gamma_;
+
+    /**
      * Stores the last bounded variations image computed
      */
     cv::Mat* OutputBV_;
@@ -89,6 +103,9 @@ private:
      * Stores the last scatterers image computed.
      */
     cv::Mat* OutputS_;
+
+    //Look-up tables must be provided.
+    TVL0DecompositionMinimizer();
 };
 
 #endif /* !TV_L0_DECOMPOSITION_MINIMIZER_HH_ */

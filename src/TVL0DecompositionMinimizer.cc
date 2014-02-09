@@ -1,16 +1,20 @@
 #include "TVL0DecompositionMinimizer.hh"
 #include "Args.hh"
 
+#include "maxflow/graph.h"
+
 #include <stdexcept>
 
-TVL0DecompositionMinimizer::TVL0DecompositionMinimizer()
-    : BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), OutputBV_(NULL), OutputS_(NULL)
+#define INFTY 1E20
+
+TVL0DecompositionMinimizer::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma)
+    : BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {
 }
 
 
-TVL0DecompositionMinimizer::TVL0DecompositionMinimizer(double BetaBV, double BetaS)
-    : BetaBV_(BetaBV), BetaS_(BetaS), OutputBV_(NULL), OutputS_(NULL)
+TVL0DecompositionMinimizer::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS)
+    : BetaBV_(BetaBV), BetaS_(BetaS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {   
 }
 
