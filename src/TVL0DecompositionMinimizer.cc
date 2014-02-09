@@ -29,6 +29,7 @@ TVL0DecompositionMinimizer::~TVL0DecompositionMinimizer()
 bool
 TVL0DecompositionMinimizer::compute(const cv::Mat& input)
 {
+    //Allocation of the output images.
     if (OutputBV_)
 	delete OutputBV_;
     OutputBV_ = new cv::Mat(input.size(), CV_8UC1);
@@ -36,6 +37,18 @@ TVL0DecompositionMinimizer::compute(const cv::Mat& input)
     if (OutputS_)
 	delete OutputS_;
     OutputS_ = new cv::Mat(input.size(), CV_8UC1);
+
+    //Allocation of the memory for the graph.
+    unsigned nbPix = input.size().width * input.size().height;
+    unsigned nbAlpha = Alpha_.size();
+    unsigned nbNodes = nbPix * nbAlpha;
+
+    Graph* g = new Graph(nbNodes, 2 * nbNodes);
+    Graph::node_id* nodes = new Graph::node_id[nbNodes];
+
+    //Creation of the nodes.
+    for (unsigned i = 0; i < nbNodes; ++i)
+	nodes[i] = g->add_node();
 
     return false;
 }
