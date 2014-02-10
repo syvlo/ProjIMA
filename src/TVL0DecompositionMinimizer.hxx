@@ -1,3 +1,6 @@
+#ifndef TV_L0_DECOMPOSITION_MINIMIZER_HXX_
+# define TV_L0_DECOMPOSITION_MINIMIZER_HXX_
+
 #include "TVL0DecompositionMinimizer.hh"
 #include "Args.hh"
 
@@ -7,18 +10,20 @@
 
 #define INFTY 1E20
 
-TVL0DecompositionMinimizer::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma)
+template <typename DataTerm>
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma)
     : BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {
 }
 
-
-TVL0DecompositionMinimizer::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS)
+template <typename DataTerm>
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS)
     : BetaBV_(BetaBV), BetaS_(BetaS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {   
 }
 
-TVL0DecompositionMinimizer::~TVL0DecompositionMinimizer()
+template <typename DataTerm>
+TVL0DecompositionMinimizer<DataTerm>::~TVL0DecompositionMinimizer()
 {
     if (OutputBV_)
 	delete OutputBV_;
@@ -26,8 +31,9 @@ TVL0DecompositionMinimizer::~TVL0DecompositionMinimizer()
 	delete OutputS_;
 }
 
+template <typename DataTerm>
 bool
-TVL0DecompositionMinimizer::compute(const cv::Mat& input)
+TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 {
     //Allocation of the output images.
     if (OutputBV_)
@@ -75,10 +81,11 @@ TVL0DecompositionMinimizer::compute(const cv::Mat& input)
 		g.add_edge(nodes[current + (level - 1) * nbPix],
 			   nodes[current + level * nbPix],
 			   INFTY,
-			   42);//FIX ME
+			   DataTerm::Compute(input.at<double>(i, j), Alpha_[level - 1]));//FIX ME
 
 	    //Last one is linked to the source
-	    g.add_tweights(nodes[current + (nbAlpha - 1) * nbPix], 42, 0);//FIX ME
+	    g.add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+			   DataTerm::Compute(input.at<double>(i, j), Alpha_[nbAlpha - 1]), 0);//FIX ME
 
 	    //////////////////////////////////////////////
             // Links definition for regularization term //
@@ -134,30 +141,37 @@ TVL0DecompositionMinimizer::compute(const cv::Mat& input)
     return true;
 }
 
+template <typename DataTerm>
 void
-TVL0DecompositionMinimizer::setBetaBV(const double BetaBV)
+TVL0DecompositionMinimizer<DataTerm>::setBetaBV(const double BetaBV)
 {
     BetaBV_ = BetaBV;
 }
 
+template <typename DataTerm>
 void
-TVL0DecompositionMinimizer::setBetaS(const double BetaS)
+TVL0DecompositionMinimizer<DataTerm>::setBetaS(const double BetaS)
 {
     BetaS_ = BetaS;
 }
 
+template <typename DataTerm>
 const cv::Mat&
-TVL0DecompositionMinimizer::getOutputBV() const
+TVL0DecompositionMinimizer<DataTerm>::getOutputBV() const
 {
     if (!OutputBV_)
 	throw std::logic_error("OutputBV has not been computed.");
     return *OutputBV_;
 }
 
+template <typename DataTerm>
 const cv::Mat&
-TVL0DecompositionMinimizer::getOutputS() const
+TVL0DecompositionMinimizer<DataTerm>::getOutputS() const
 {
     if (!OutputS_)
 	throw std::logic_error("OutputS has not been computed.");
     return *OutputS_;
 }
+
+
+#endif /* !TV_L0_DECOMPOSITION_MINIMIZER_HXX_ */

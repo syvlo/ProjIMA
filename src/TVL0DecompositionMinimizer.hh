@@ -16,6 +16,7 @@
  * \class TVL0DecompositionMinimizer
  * \brief Class doing the computations using the mincut algorithm.
  */
+template <typename DataTerm>
 class TVL0DecompositionMinimizer
 {
 public:
@@ -107,6 +108,8 @@ private:
     //Look-up tables must be provided.
     TVL0DecompositionMinimizer();
 };
+
+#include "TVL0DecompositionMinimizer.hxx"
 
 #endif /* !TV_L0_DECOMPOSITION_MINIMIZER_HH_ */
 
