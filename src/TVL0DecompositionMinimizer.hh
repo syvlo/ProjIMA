@@ -2,7 +2,7 @@
 # define TV_L0_DECOMPOSITION_MINIMIZER_HH_
 
 /**
- * \file Args.hh
+ * \file TVL0DecompositionMinimizer.hh
  * \author Sylvain Lobry
  * \date 02/01/2014
  * \brief File that defines the minimizer.
