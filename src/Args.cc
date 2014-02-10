@@ -1,5 +1,6 @@
 #include "Args.hh"
 #include <cstdlib>
+#include <cstring>
 
 Args::Args (int argc, char* argv[])
 {

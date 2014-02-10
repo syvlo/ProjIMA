@@ -27,6 +27,6 @@ public:
     static Output Compute(const Input& ObservedValue, const Input& RegularizedValue);
 };
 
-#include "QuadraticDataterm.hxx"
+#include "QuadraticDataTerm.hxx"
 
 #endif /* !QUADRATIC_DATA_TERM_HH_ */
