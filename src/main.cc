@@ -20,14 +20,13 @@ int main (int argc, char* argv[])
     std::cout << args << std::endl;
 
     //FIX ME
-    //    double alpha_tmp[] = {0, 1, 2, 3};
-    std::vector<double> alpha;// (alpha_tmp, alpha_tmp + sizeof(alpha_tmp) / sizeof(alpha_tmp));
+    std::vector<unsigned> alpha;
     for (unsigned i = 0; i < 255; ++i)
-	alpha.push_back(i);
-    double gamma_tmp[] = {0, 1, 2};
-    std::vector<double> gamma (gamma_tmp, gamma_tmp + sizeof(gamma_tmp) / sizeof(gamma_tmp));
+    	alpha.push_back(i);
+    unsigned gamma_tmp[] = {0, 1, 2};
+    std::vector<unsigned> gamma (gamma_tmp, gamma_tmp + sizeof(gamma_tmp) / sizeof(gamma_tmp));
 
-    TVL0DecompositionMinimizer<QuadraticDataTerm<double, double> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+    TVL0DecompositionMinimizer<QuadraticDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {

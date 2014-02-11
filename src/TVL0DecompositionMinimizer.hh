@@ -26,7 +26,7 @@ public:
      * \param		alpha Look-up table for the values of alpha_i.
      * \param		gamma Look-up table for the values of gamma_i.
      */
-    TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma);
+    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma);
 
     /**
      * \brief		Constructor.
@@ -35,7 +35,7 @@ public:
      * \param		BetaBV	Value for BetaBV.
      * \param		BetaS	Value for BetaS.
      */
-    TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS);
+    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma, double BetaBV, double BetaS);
 
     /**
      * \brief		Destructor.
@@ -88,12 +88,12 @@ private:
     /**
      * look-up table for alpha_i values, i.e. possible values for BV image.
      */
-    const std::vector<double> Alpha_;
+    const std::vector<unsigned> Alpha_;
 
     /**
      * look-up table for gamma_i values, i.e. possible values for S image.
      */
-    const std::vector<double> Gamma_;
+    const std::vector<unsigned> Gamma_;
 
     /**
      * Stores the last bounded variations image computed

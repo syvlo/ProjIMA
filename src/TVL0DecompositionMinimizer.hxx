@@ -7,17 +7,18 @@
 #include "maxflow/graph.h"
 
 #include <stdexcept>
+#include <iostream>
 
 #define INFTY 1E20
 
 template <typename DataTerm>
-TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma)
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma)
     : BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {
 }
 
 template <typename DataTerm>
-TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<double>& alpha, const std::vector<double>& gamma, double BetaBV, double BetaS)
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma, double BetaBV, double BetaS)
     : BetaBV_(BetaBV), BetaS_(BetaS), Alpha_(alpha), Gamma_(gamma), OutputBV_(NULL), OutputS_(NULL)
 {   
 }
@@ -38,7 +39,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     //Allocation of the output images.
     if (OutputBV_)
 	delete OutputBV_;
-    OutputBV_ = new cv::Mat(input.size(), CV_64F);
+    OutputBV_ = new cv::Mat(input.size(), CV_8U);
 
     if (OutputS_)
 	delete OutputS_;
@@ -51,13 +52,15 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     unsigned nbAlpha = Alpha_.size();
     unsigned nbNodes = nbPix * nbAlpha;
 
+    std::clog << "Graph construction:" << std::flush;
+
     //Allocation of the memory for the graph.
-    Graph g (nbNodes, 2 * nbNodes);
+    Graph* g = new Graph(nbNodes, 2 * nbNodes);
     Graph::node_id* nodes = new Graph::node_id[nbNodes];
 
     //Creation of the nodes.
     for (unsigned i = 0; i < nbNodes; ++i)
-	nodes[i] = g.add_node();
+      nodes[i] = g->add_node();
 
     //Links definition
     for (unsigned i = 0; i < Height; ++i)
@@ -74,18 +77,18 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
             ///////////////////////////////////
 
 	    //Smallest alpha is linked to the sink with infinite weight.
-	    g.add_tweights(nodes[current], 0, INFTY);
+	    g->add_tweights(nodes[current], 0, INFTY);
 
 	    //Every level (except last one) is linked to the one above it.
 	    for (unsigned level = 1; level < nbAlpha; ++level)
-		g.add_edge(nodes[current + (level - 1) * nbPix],
+		g->add_edge(nodes[current + (level - 1) * nbPix],
 			   nodes[current + level * nbPix],
 			   INFTY,
-			   DataTerm::Compute(input.at<double>(i, j), Alpha_[level - 1]));//FIX ME
+			   DataTerm::Compute(input.at<unsigned>(i, j), Alpha_[level]));//FIX ME
 
 	    //Last one is linked to the source
-	    g.add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-			   DataTerm::Compute(input.at<double>(i, j), Alpha_[nbAlpha - 1]), 0);//FIX ME
+	    g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+			   DataTerm::Compute(input.at<unsigned>(i, j), Alpha_[nbAlpha - 1]), 0);//FIX ME
 
 	    //////////////////////////////////////////////
             // Links definition for regularization term //
@@ -94,8 +97,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 	    if (j < Width - 1)
 		for (unsigned level = 1; level <= nbAlpha; ++level)
 		{
-		    double beta = BetaBV_ * (Alpha_[level] - Alpha_[level - 1]);
-		    g.add_edge(nodes[current + (level - 1) * nbPix],
+		    double beta = BetaBV_;
+		    g->add_edge(nodes[current + (level - 1) * nbPix],
 			       nodes[current + (level - 1) * nbPix + 1],
 			       beta, beta);
 		}
@@ -104,39 +107,44 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 	    if (i < Height - 1)
 		for (unsigned level = 1; level <= nbAlpha; ++level)
 		{
-		    double beta = BetaBV_ * (Alpha_[level] - Alpha_[level - 1]);
-		    g.add_edge(nodes[current + (level - 1) * nbPix],
-			       nodes[current + (level - 1) * nbPix + Height],
-			       beta, beta);
+		  double beta = BetaBV_;
+		    g->add_edge(nodes[current + (level - 1) * nbPix],
+				nodes[current + (level - 1) * nbPix + Height],
+				beta, beta);
 		}
 	}
     }
 
+    std::clog << " done." << std::endl;
+    std::clog << "Max flow computation:" << std::flush;
     //Computation of max flow.
-    g.maxflow();
+    std::cout << g->maxflow();
+    std::clog << " done." << std::endl;
 
     //Construction of the ouput image.
     for (unsigned i = 0; i < Height; ++i)
     {
-	unsigned offset = i * Width;
-	for (unsigned j = 0; j < Width; ++j)
-	{
-	    unsigned current = offset + j;
-	    OutputBV_->at<double>(i, j) = 1;
+    	unsigned offset = i * Width;
+    	for (unsigned j = 0; j < Width; ++j)
+    	{
+    	    unsigned current = offset + j;
+    	    OutputBV_->at<unsigned>(i, j) = Alpha_[1];
 
-	    for (unsigned level = nbAlpha; level >= 1; --level)
-	    {
-		if (g.what_segment(nodes[current + (level - 1) * nbPix])
-		    != Graph::SOURCE)
-		{
-		    OutputBV_->at<double>(i, j) = Alpha_[level];
-		    break;
-		}
-	    }
-	}
+    	    for (unsigned level = nbAlpha; level >= 1; --level)
+    	    {
+    		if (g->what_segment(nodes[current + (level - 1) * nbPix])
+    		    != Graph::SOURCE)
+    		{
+    		    OutputBV_->at<unsigned>(i, j) = Alpha_[level];
+		    std::cout << i << " " << j << " : " << OutputBV_->at<unsigned>(i, j) << std::endl;
+    		    break;
+    		}
+    	    }
+    	}
     }
 
-    delete nodes;
+    delete g;
+    delete[] nodes;
 
     return true;
 }
