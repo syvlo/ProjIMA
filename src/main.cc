@@ -39,8 +39,8 @@ int main (int argc, char* argv[])
 	cv::Mat input = cv::imread(args.getInputImage(), CV_LOAD_IMAGE_GRAYSCALE);
 	if (minimizer.compute(input))
 	{
-	    cv::imwrite(args.getOutputImageBV(), minimizer.getOutputBV());
-	    cv::imwrite(args.getOutputImageS(), minimizer.getOutputS());
+	  cv::imwrite(args.getOutputImageBV(), minimizer.getOutputBV());
+	    //cv::imwrite(args.getOutputImageS(), minimizer.getOutputS());
 	}
 	else
 	{

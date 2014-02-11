@@ -98,12 +98,12 @@ private:
     /**
      * Stores the last bounded variations image computed
      */
-    cv::Mat* OutputBV_;
+    cv::Mat OutputBV_;
 
     /**
      * Stores the last scatterers image computed.
      */
-    cv::Mat* OutputS_;
+    cv::Mat OutputS_;
 
     //Look-up tables must be provided.
     TVL0DecompositionMinimizer();
