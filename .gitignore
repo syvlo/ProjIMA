@@ -15,3 +15,9 @@
 # Emacs
 *~
 \#*\#
+
+# CMake related
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
