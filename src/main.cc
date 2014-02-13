@@ -6,6 +6,7 @@
 #include "Args.hh"
 #include "TVL0DecompositionMinimizer.hh"
 #include "QuadraticDataTerm.hh"
+#include "RayleighDataTerm.hh"
 
 int main (int argc, char* argv[])
 {
@@ -26,7 +27,7 @@ int main (int argc, char* argv[])
     unsigned gamma_tmp[] = {0, 1, 2};
     std::vector<unsigned> gamma (gamma_tmp, gamma_tmp + sizeof(gamma_tmp) / sizeof(gamma_tmp));
 
-    TVL0DecompositionMinimizer<QuadraticDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+    TVL0DecompositionMinimizer<RayleighDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {
