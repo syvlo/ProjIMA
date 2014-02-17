@@ -11,6 +11,7 @@ find_package( OpenCV REQUIRED )
 add_executable(${BIN_DIR}/Denoise
   ${SRC_DIR}/main.cc
   ${SRC_DIR}/Args.cc
+  ${SRC_DIR}/ImwHelper.cc
   ${SRC_DIR}/maxflow/graph.cpp
   ${SRC_DIR}/maxflow/maxflow.cpp
 )
