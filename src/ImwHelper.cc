@@ -42,6 +42,7 @@ ReadImw (const char* DimFileName,
 		unsigned short value = (unsigned char)buffer[0] * 256 + (unsigned char)buffer[1];
 		output.at<unsigned short>(i, j) = value;
 	    }
+	imwFile.close();
     }
     else
     {
