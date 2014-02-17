@@ -67,6 +67,48 @@ ReadImw (const char* FileName)
     return ReadImw (dim, imw);
 }
 
+void
+WriteImw (const cv::Mat		image,
+	  const char*		DimFileName,
+	  const char*		ImwFileName)
+{
+    std::ofstream dimFile (DimFileName, std::ofstream::out);
+
+    unsigned Height = image.size().height;
+    unsigned Width = image.size().width;
+
+    if (dimFile.is_open())
+    {
+	dimFile << Height << " " << Width;
+	dimFile.close();
+    }
+    else
+    {
+	throw std::runtime_error("Problem when opening dim file.");
+    }
+
+    std::ofstream imwFile (ImwFileName, std::ifstream::out);
+    if (imwFile.is_open())
+    {
+	char buffer[2];
+	for (unsigned int i = 0; i < Height; ++i)
+	    for (unsigned int j = 0; j < Width; ++j)
+	    {
+		unsigned short value = image.at<unsigned short>(i, j);
+		buffer[0] = (unsigned char)(value >> 8);
+		buffer[1] = (unsigned char)value;
+
+		imwFile.write(buffer, 2);
+	    }
+	imwFile.close();
+    }
+    else
+    {
+	throw std::runtime_error("Problem when opening imw file.");
+    }
+
+}
+
 cv::Mat
 convertTo8U (const cv::Mat	Input,
 	     double		nsigma)
