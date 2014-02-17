@@ -5,7 +5,7 @@
  * \file ImwHelper.hh
  * \author Sylvain Lobry
  * \date 02/17/2014
- * \brief File taht defines the function to read imw files.
+ * \brief File taht defines the function to work with imw files.
  */
 
 #include <cv.h>
@@ -20,5 +20,15 @@
 cv::Mat
 ReadImw (const char* DimFileName,
 	 const char* ImwFileName);
+
+/**
+ * \brief	Function that convert a CV_16U cv::Mat to a CV_8U (so it can be
+ *		displayed) keeping values between 0 and mu + nsigma * sigma.
+ * \param	Input	The input matrix (of type CV_16U).
+ * \return	The ouput matrix.
+ */
+cv::Mat
+convertTo8U (const cv::Mat	Input,
+	     double		nsigma = 3);
 
 #endif /* !IMW_HELPER_HH_ */
