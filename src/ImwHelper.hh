@@ -45,6 +45,16 @@ WriteImw (const cv::Mat image,
 	  const char* ImwFileName);
 
 /**
+ * \brief	Write image to an imw file.
+ * \param	image		The image to be written (CV_16U).
+ * \param	ImwFileName	Base FileName. FileName.imw and FileName.dim
+				will be created.
+ */
+void
+WriteImw (const cv::Mat image,
+	  const char* FileName);
+
+/**
  * \brief	Function that convert a CV_16U cv::Mat to a CV_8U (so it can be
  *		displayed) keeping values between 0 and mu + nsigma * sigma.
  * \param	Input	The input matrix (of type CV_16U).

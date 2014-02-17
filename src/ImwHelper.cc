@@ -109,6 +109,22 @@ WriteImw (const cv::Mat		image,
 
 }
 
+void
+WriteImw (const cv::Mat		image,
+	  const char*		FileName)
+{
+    char dim[4242];
+    char imw[4242];
+
+    strcpy(dim, FileName);
+    strcat(dim, ".dim");
+
+    strcpy(imw, FileName);
+    strcat(imw, ".imw");
+
+    WriteImw (image, dim, imw);
+}
+
 cv::Mat
 convertTo8U (const cv::Mat	Input,
 	     double		nsigma)
