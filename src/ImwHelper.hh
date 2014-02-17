@@ -13,13 +13,25 @@
 /**
  * \brief	Function that takes an imw file as input and return a cv::Mat
  *		storing it.
- * \param	DimFileName	*.dim file containing the dimension of the image.
- * \param	ImwFileName	*.imw file that contains the values (unsigned int 16).
+ * \param	DimFileName	*.dim file containing the dimension of the
+				image.
+ * \param	ImwFileName	*.imw file that contains the values (unsigned
+				int 16).
  * \return	The cv::Mat (of type CV_16U)
  */
 cv::Mat
 ReadImw (const char* DimFileName,
 	 const char* ImwFileName);
+
+/**
+ * \brief	Function that takes an imw file as input and return a cv::Mat
+ *		storing it.
+ * \param	FileName	File name of the input. So FileName.dim and
+				FileNale.imw must exists.
+ * \return	The cv::Mat (of type CV_16U)
+ */
+cv::Mat
+ReadImw (const char* FileName);
 
 /**
  * \brief	Function that convert a CV_16U cv::Mat to a CV_8U (so it can be

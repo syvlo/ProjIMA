@@ -5,6 +5,7 @@
 #include <fstream>
 #include <exception>
 #include <cmath>
+#include <cstring>
 
 cv::Mat
 ReadImw (const char* DimFileName,
@@ -48,6 +49,21 @@ ReadImw (const char* DimFileName,
     }
 
     return output;
+}
+
+cv::Mat
+ReadImw (const char* FileName)
+{
+    char dim[4242];
+    char imw[4242];
+
+    strcpy(dim, FileName);
+    strcat(dim, ".dim");
+
+    strcpy(imw, FileName);
+    strcat(imw, ".imw");
+
+    return ReadImw (dim, imw);
 }
 
 cv::Mat
