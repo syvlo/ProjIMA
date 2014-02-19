@@ -19,3 +19,12 @@ add_executable(${BIN_DIR}/Denoise
 target_link_libraries (${BIN_DIR}/Denoise
   ${OpenCV_LIBS}
 )
+
+add_executable(${BIN_DIR}/Viewer
+  ${SRC_DIR}/viewer.cc
+  ${SRC_DIR}/ImwHelper.cc
+)
+
+target_link_libraries (${BIN_DIR}/Viewer
+  ${OpenCV_LIBS}
+)
