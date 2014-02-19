@@ -127,7 +127,8 @@ WriteImw (const cv::Mat		image,
 
 cv::Mat
 convertTo8U (const cv::Mat	Input,
-	     double		nsigma)
+	     double		nsigma,
+	     double		*threshOutput)
 {
     unsigned Height = Input.size().height;
     unsigned Width = Input.size().width;
@@ -159,6 +160,20 @@ convertTo8U (const cv::Mat	Input,
 
     double thresh = mu + nsigma * sigma;
 
+    if (threshOutput != NULL)
+	*threshOutput = thresh;
+
+    return convertTo8UUsingThresh(Input, thresh);
+}
+
+
+cv::Mat
+convertTo8UUsingThresh(const cv::Mat	Input,
+		       double		thresh)
+{
+    unsigned Height = Input.size().height;
+    unsigned Width = Input.size().width;
+
     cv::Mat output (Height, Width, CV_8U);
     for (unsigned i = 0; i < Height; ++i)
 	for (unsigned j = 0; j < Width; ++j)
@@ -168,6 +183,6 @@ convertTo8U (const cv::Mat	Input,
 		value = thresh;
 	    output.at<unsigned char>(i, j) = (double)(value * 255) / thresh;
 	}
-    
+
     return output;
 }

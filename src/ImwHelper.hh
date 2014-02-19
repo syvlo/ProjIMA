@@ -57,11 +57,25 @@ WriteImw (const cv::Mat image,
 /**
  * \brief	Function that convert a CV_16U cv::Mat to a CV_8U (so it can be
  *		displayed) keeping values between 0 and mu + nsigma * sigma.
- * \param	Input	The input matrix (of type CV_16U).
+ * \param	Input		The input matrix (of type CV_16U).
+ * \param	nsigma		The factor to be used (see formula above).
+ * \param	threshOutput	The upper threshold for values to be displayed.
  * \return	The ouput matrix.
  */
 cv::Mat
 convertTo8U (const cv::Mat	Input,
-	     double		nsigma = 3);
+	     double		nsigma = 3,
+	     double*		threshOutput = NULL);
+
+/**
+ * \brief	Function that convert a CV_16U cv::Mat to a CV_8U by putting
+ *		values from [0...thresh] to [0...255].
+ * \param	Input		The input matrix (of type CV_16U).
+ * \param	thresh		The threshold (see formula above).
+ * \return	The output matrix (of type CV_8U).
+ */
+cv::Mat
+convertTo8UUsingThresh(const cv::Mat	Input,
+		       double		thresh);
 
 #endif /* !IMW_HELPER_HH_ */
