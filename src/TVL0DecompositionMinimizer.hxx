@@ -68,14 +68,28 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 
     	    //Every level (except last one) is linked to the one above it.
     	    for (unsigned level = 1; level < nbAlpha; ++level)
-    		g->add_edge(nodes[current + (level - 1) * nbPix],
-    			   nodes[current + level * nbPix],
-    			   INFTY,
-    			   DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level]));//FIX ME
+	    {
+		if (input.type() == CV_8U)
+		    g->add_edge(nodes[current + (level - 1) * nbPix],
+				nodes[current + level * nbPix],
+				INFTY,
+				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level]));
+		else
+		    g->add_edge(nodes[current + (level - 1) * nbPix],
+				nodes[current + level * nbPix],
+				INFTY,
+				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level]));
+	    }
 
     	    //Last one is linked to the source
-    	    g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-    			   DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[nbAlpha - 1]), 0);//FIX ME
+	    if (input.type() == CV_8U)
+		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+				DataTerm::Compute(input.at<unsigned char>(i, j),
+						  Alpha_[nbAlpha - 1]), 0);
+	    else
+		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+				DataTerm::Compute(input.at<unsigned short>(i, j),
+						  Alpha_[nbAlpha - 1]), 0);
 
     	    //////////////////////////////////////////////
             // Links definition for regularization term //
@@ -87,7 +101,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     		    double beta = BetaBV_;
     		    g->add_edge(nodes[current + (level - 1) * nbPix],
     			       nodes[current + (level - 1) * nbPix + 1],
-    			       beta, beta);
+				beta * (Alpha_[level] - Alpha_[level - 1]),
+				beta * (Alpha_[level] - Alpha_[level - 1]));
     		}
 
     	    //Southern neighbour
@@ -98,7 +113,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				//Ou + Height comme dans TP ?
     				nodes[current + (level - 1) * nbPix + Width],
-    				beta, beta);
+    				beta * (Alpha_[level] - Alpha_[level - 1]),
+				beta * (Alpha_[level] - Alpha_[level - 1]));
     		}
     	}
     }
@@ -110,7 +126,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     std::clog << " done." << std::endl
 	      << "Value = " << MaxFlowValue << std::endl;
 
-    OutputBV_ = cv::Mat(Height, Width, CV_8U);
+    OutputBV_ = cv::Mat(Height, Width, input.type());
 
     //Construction of the ouput image.
     for (unsigned i = 0; i < Height; ++i)
@@ -119,14 +135,20 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     	for (unsigned j = 0; j < Width; ++j)
     	{
     	    unsigned current = offset + j;
-    	    OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
+	    if (input.type() == CV_8U)
+		OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
+	    else
+		OutputBV_.at<unsigned short>(i, j) = Alpha_[0];
 
     	    for (unsigned level = nbAlpha - 1; level >= 1; --level)
     	    {
     		if (g->what_segment(nodes[current + (level - 1) * nbPix])
     		    != Graph::SOURCE)
     		{
-		    OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
+		    if (input.type() == CV_8U)
+			OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
+		    else
+			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
      		    break;
     		}
     	    }
