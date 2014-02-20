@@ -11,6 +11,7 @@ Args::Args (int argc, char* argv[])
     BetaS_ = DEFAULT_BBV;
     BetaBV_ = DEFAULT_BS;
     WindowMode_ = DEFAULT_WINDOW_MODE;
+    RadarMode_ = DEFAULT_RADAR_MODE;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -35,6 +36,8 @@ Args::Args (int argc, char* argv[])
 	}
 	else if (!strcmp("-w", argv[i]) || !strcmp("--Window", argv[i]))
 	    WindowMode_ = true;
+	else if (!strcmp("-r", argv[i]) || !strcmp("--Radar", argv[i]))
+	    RadarMode_ = true;
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	    printHelp();
 
@@ -71,6 +74,7 @@ Args::printHelp() const
 	      << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
 	      << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
 	      << "* -w/--Window, switch to window mode;" << std::endl
+	      << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
 	      << "* -h/--help, print this message;" << std::endl;
 }
 
@@ -110,6 +114,12 @@ Args::getWindowMode() const
     return WindowMode_;
 }
 
+bool
+Args::getRadarMode() const
+{
+    return RadarMode_;
+}
+
 std::ostream&
 operator<< (std::ostream& stream, const Args& args)
 {
@@ -121,7 +131,8 @@ operator<< (std::ostream& stream, const Args& args)
 	stream << "OutputImageBV = " << args.OutputImageBV_ << "," << std::endl;
     if (args.OutputImageS_)
 	stream << "OutputImageS = " << args.OutputImageS_ << "," << std::endl;
-    stream << "Window Mode = " << args.WindowMode_;
+    stream << "Window Mode = " << args.WindowMode_ << std::endl;
+    stream << "Radar Mode = " << args.RadarMode_;
     return stream;
 }
 

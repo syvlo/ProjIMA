@@ -25,6 +25,10 @@
  */
 # define DEFAULT_WINDOW_MODE (false)
 
+/**
+ * Default value for RadarMode
+ */
+# define DEFAULT_RADAR_MODE (false)
 
 /**
  * \class Args
@@ -98,6 +102,12 @@ public:
      */
     bool getWindowMode() const;
 
+    /**
+     * \brief		Getter for radar mode option.
+     * \return		RadarMode.
+     */
+    bool getRadarMode() const;
+
 
     /**
      * \brief		Print the arguments and their values.
@@ -140,6 +150,11 @@ private:
      * \brief		Boolean to defines if a GUI should be used.
      */
     bool WindowMode_;
+
+    /**
+     * \brief		Boolean to defines if radar mode or plain grey level.
+     */
+    bool RadarMode_;
 
     //We do not want to be able to initialize an empty arguments instance.
     Args();
