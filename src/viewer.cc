@@ -98,7 +98,7 @@ int main (int argc, char* argv[])
 	cv::Mat right(wholeImage, cv::Rect(img1_8U.size().width + BORDER, 0,
 					   img2_8U.size().width,
 					   img2_8U.size().height));
-	img1_8U.copyTo(right);
+	img2_8U.copyTo(right);
     }
 
     struct data userData;
