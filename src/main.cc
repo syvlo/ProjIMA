@@ -24,11 +24,6 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    // cv::Mat tmp = ReadImw("test");
-    // cv::Rect roi (100, 100, 100, 100);
-    // cv::Mat cropped = tmp(roi).clone();
-    // WriteImw(cropped, "cropped");
-
     //FIX ME
     //Alpha definition (labels for BV image).
     std::vector<unsigned> alpha;
