@@ -12,6 +12,9 @@
 int main (int argc, char* argv[])
 {
     Args args(argc, argv);
+    if (args.getHelp()) //Help was asked and has been printed, leave.
+	return (0);
+
     if (!args.checkConsistency())
     {
 	std::cerr << "Error: in non-WindowMode, you have to define input and output images." << std::endl;

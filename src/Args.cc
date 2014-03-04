@@ -39,8 +39,10 @@ Args::Args (int argc, char* argv[])
 	else if (!strcmp("-r", argv[i]) || !strcmp("--Radar", argv[i]))
 	    RadarMode_ = true;
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
+	{
 	    printHelp();
-
+	    Help_ = true;
+	}
 	else
 	    std::cerr << "Warning: unknown parameter: " << argv[i] << std::endl;
     }
@@ -76,6 +78,12 @@ Args::printHelp() const
 	      << "* -w/--Window, switch to window mode;" << std::endl
 	      << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
 	      << "* -h/--help, print this message;" << std::endl;
+}
+
+bool
+Args::getHelp() const
+{
+    return Help_;
 }
 
 double

@@ -108,6 +108,11 @@ public:
      */
     bool getRadarMode() const;
 
+    /**
+     * \brief		Getter for Help_ bool.
+     * \return		Help_;
+     */
+    bool getHelp() const;
 
     /**
      * \brief		Print the arguments and their values.
@@ -155,6 +160,11 @@ private:
      * \brief		Boolean to defines if radar mode or plain grey level.
      */
     bool RadarMode_;
+
+    /**
+     * \brief		Boolean to defines if help was called.
+     */
+    bool Help_;
 
     //We do not want to be able to initialize an empty arguments instance.
     Args();
