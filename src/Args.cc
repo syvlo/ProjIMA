@@ -13,6 +13,7 @@ Args::Args (int argc, char* argv[])
     BetaBV_ = DEFAULT_BS;
     WindowMode_ = DEFAULT_WINDOW_MODE;
     RadarMode_ = DEFAULT_RADAR_MODE;
+    Help_ = false;
 
     for (int i = 1; i < argc; ++i)
     {
