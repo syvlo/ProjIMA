@@ -24,7 +24,18 @@ public:
      * \param	RegularizedValue	Value to be tested (i.e. x_s)
      * \return  The value for the data term.
      */
-    static Output Compute(const Input& ObservedValue, const Input& RegularizedValue);
+    static Output Compute(const Input& ObservedValue, const Input& RegularizedValue,
+			  const std::vector<Input>& gamma, const double BetaS);
+    /**
+     * \brief Method to compute The sparse component.
+     * \param	ObservedValue		Observed value (i.e. y_s).
+     * \param	RegularizedValue	Value to be tested (i.e. x_s).
+     * \param   gamma			Values for us (not used here).
+     * \param   BetaS			Value for betaS (not used here).
+     * \return  The value for Us.
+     */
+    static Output ComputeUs(const Input& ObservedValue, const Input& RegularizedValue,
+			    const std::vector<Input>& gamma, const double BetaS);
 };
 
 #include "QuadraticDataTerm.hxx"
