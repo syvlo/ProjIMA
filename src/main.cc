@@ -37,7 +37,7 @@ int main (int argc, char* argv[])
     	//     alpha.push_back(i);
     	// for (unsigned i = 800; i < 3000; i += 100)
     	//     alpha.push_back(i);
-    	for (unsigned i = 0; i < 3000; i += 30)
+    	for (unsigned i = 0; i < 1000; i += 30)
     	    alpha.push_back(i);
     }
 
@@ -74,6 +74,13 @@ int main (int argc, char* argv[])
 		cv::imwrite(args.getOutputImageS(), minimizer.getOutputS());
 	    else
 		WriteImw(minimizer.getOutputS(), args.getOutputImageS());
+	    if (args.getOutputImageComplete())
+	    {
+		if (!args.getRadarMode())
+		    cv::imwrite(args.getOutputImageComplete(), minimizer.getOutputComplete());
+		else
+		    WriteImw(minimizer.getOutputComplete(), args.getOutputImageComplete());
+	    }
 	}
 	else
 	{

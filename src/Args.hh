@@ -97,6 +97,12 @@ public:
     const char* getOutputImageS() const;
 
     /**
+     * \brief		Getter for complete output image
+     * \return		OutputImageComplete.
+     */
+    const char* getOutputImageComplete() const;
+
+    /**
      * \brief		Getter for window mode option.
      * \return		WindowMode.
      */
@@ -141,15 +147,22 @@ private:
     char* InputImage_;
 
     /**
-     * \brief		Path to where the bounded variations image should be
-     *			stored.
+     * \brief		Path to image where the bounded variations image
+     *			should be stored.
      */
     char* OutputImageBV_;
 
     /**
-     * \brief		Path to where the scaterrers image should be stored.
+     * \brief		Path to image where the scaterrers image should be
+     *			stored.
      */
     char* OutputImageS_;
+
+    /**
+     * \brief		Path to image where the whole denoised image should be
+     *			stored.
+     */
+    char* OutputImageComplete_;
 
     /**
      * \brief		Boolean to defines if a GUI should be used.

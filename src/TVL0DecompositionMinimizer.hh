@@ -74,6 +74,12 @@ public:
      */
     const cv::Mat& getOutputS() const;
 
+    /**
+     * \brief		Getter for the complete image.
+     * \return		The image.
+     */
+    const cv::Mat& getOutputComplete() const;
+
 private:
     /**
      * Beta parameter for the bounded variation component.
@@ -104,6 +110,11 @@ private:
      * Stores the last scatterers image computed.
      */
     cv::Mat OutputS_;
+
+    /**
+     * Stores the last complete image computed.
+     */
+    cv::Mat OutputComplete_;
 
     //Look-up tables must be provided.
     TVL0DecompositionMinimizer();

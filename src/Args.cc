@@ -8,6 +8,7 @@ Args::Args (int argc, char* argv[])
     InputImage_ = NULL;
     OutputImageBV_ = NULL;
     OutputImageS_ = NULL;
+    OutputImageComplete_ = NULL;
     BetaS_ = DEFAULT_BBV;
     BetaBV_ = DEFAULT_BS;
     WindowMode_ = DEFAULT_WINDOW_MODE;
@@ -34,6 +35,11 @@ Args::Args (int argc, char* argv[])
 	    OutputImageS_ = new char[strlen(argv[++i])];
 	    std::strcpy(OutputImageS_, argv[i]);
 	}
+	else if (!strcmp("-oC", argv[i]) || !strcmp("--OutputImageComplete", argv[i]))
+	{
+	    OutputImageComplete_ = new char[strlen(argv[++i])];
+	    std::strcpy(OutputImageComplete_, argv[i]);
+	}
 	else if (!strcmp("-w", argv[i]) || !strcmp("--Window", argv[i]))
 	    WindowMode_ = true;
 	else if (!strcmp("-r", argv[i]) || !strcmp("--Radar", argv[i]))
@@ -56,6 +62,8 @@ Args::~Args()
 	delete[] OutputImageBV_;
     if (OutputImageS_)
 	delete[] OutputImageS_;
+    if (OutputImageComplete_)
+	delete[] OutputImageComplete_;
 }
 
 bool
@@ -75,6 +83,7 @@ Args::printHelp() const
 	      << "* -i/--InputImage <value>, image to be denoised;" << std::endl
 	      << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
 	      << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
+	      << "* -oC/--OutputImageComplete <value>, image to store the denoised image;" << std::endl
 	      << "* -w/--Window, switch to window mode;" << std::endl
 	      << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
 	      << "* -h/--help, print this message;" << std::endl;
@@ -116,6 +125,12 @@ Args::getOutputImageS() const
     return OutputImageS_;
 }
 
+const char*
+Args::getOutputImageComplete() const
+{
+    return OutputImageComplete_;
+}
+
 bool
 Args::getWindowMode() const
 {
@@ -139,6 +154,8 @@ operator<< (std::ostream& stream, const Args& args)
 	stream << "OutputImageBV = " << args.OutputImageBV_ << "," << std::endl;
     if (args.OutputImageS_)
 	stream << "OutputImageS = " << args.OutputImageS_ << "," << std::endl;
+    if (args.OutputImageComplete_)
+	stream << "OutputImageComplete = " << args.OutputImageComplete_ << "," << std::endl;
     stream << "Window Mode = " << args.WindowMode_ << std::endl;
     stream << "Radar Mode = " << args.RadarMode_;
     return stream;

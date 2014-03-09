@@ -128,6 +128,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 
     OutputBV_ = cv::Mat(Height, Width, input.type());
     OutputS_ = cv::Mat(Height, Width, input.type());
+    OutputComplete_ = cv::Mat(Height, Width, input.type());
 
     //Construction of the ouput image.
     for (unsigned i = 0; i < Height; ++i)
@@ -158,6 +159,14 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 			OutputS_.at<unsigned short>(i, j) =
 			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),
 						Alpha_[level], Gamma_, BetaS_);
+		    if (input.type() == CV_8U)
+			OutputComplete_.at<unsigned char>(i, j) =
+			    OutputBV_.at<unsigned char>(i, j)
+			    + OutputS_.at<unsigned char>(i, j);
+		    else
+			OutputComplete_.at<unsigned short>(i, j) =
+			    OutputBV_.at<unsigned short>(i, j)
+			    + OutputS_.at<unsigned short>(i, j);
      		    break;
     		}
     	    }
@@ -196,6 +205,13 @@ const cv::Mat&
 TVL0DecompositionMinimizer<DataTerm>::getOutputS() const
 {
     return OutputS_;
+}
+
+template <typename DataTerm>
+const cv::Mat&
+TVL0DecompositionMinimizer<DataTerm>::getOutputComplete() const
+{
+    return OutputComplete_;
 }
 
 
