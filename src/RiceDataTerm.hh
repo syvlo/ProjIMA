@@ -25,16 +25,13 @@ public:
      * \param	RegularizedValue	Value to be tested (i.e. x_s)
      * \return  The value for the data term.
      */
-    static Output Compute(const Input& V, const Input& Ubv);
+    static Output Compute(const Input& V, const Input& Ubv, const std::vector<Input>& gamma, const double BetaS);
 
     static Output ComputeDataTermOnly(const Input& ObservedValue, const Input& RegularizedValue, const Input& Us);
 
-    static Input ComputeUs(const Input& V, const Input& Ubv);
+    static Input ComputeUs(const Input& V, const Input& Ubv, const std::vector<Input>& gamma, const double BetaS);
 
-    static Input i0(const Input& x);
-
-    static std::vector<Input> gamma;
-    static double BetaS;
+    static double i0(const Input& x);
 };
 
 #include "RiceDataTerm.hxx"

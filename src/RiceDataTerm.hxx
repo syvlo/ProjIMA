@@ -8,10 +8,14 @@
 template <typename Input, typename Output>
 Output
 RiceDataTerm<Input,Output>::Compute(const Input& V,
-				    const Input& Ubv)
+				    const Input& Ubv,
+				    const std::vector<Input>& gamma,
+				    const double BetaS)
 {
-    Input Us = RiceDataTerm<Input,Output>::ComputeUs(Ubv);
-    return ComputeDataTermOnly(V, Ubv, Us);
+    Input Us = RiceDataTerm<Input,Output>::ComputeUs(V, Ubv, gamma, BetaS);
+    Output res = ComputeDataTermOnly(V, Ubv, Us);
+    //    std::cout << "Pour V = " << V << ", Ubv = " << Ubv << ", res = " << res << std::endl;
+    return res;
 }
 
 
@@ -22,18 +26,20 @@ RiceDataTerm<Input,Output>::ComputeDataTermOnly(const Input& V,
 						const Input& Us)
 {
     return static_cast<Output> ((V * V + Us * Us) / (2 * Ubv * Ubv)
-				+ 2 log(Ubv)
-				- log(i0(v * Us / (Ubv * Ubv))));
+				+ 2 * log(Ubv)
+				- log(i0(V * Us / (Ubv * Ubv))));
 }
 
 template <typename Input, typename Output>
 Input
 RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
-				      const Input& Ubv)
+				      const Input& Ubv,
+				      const std::vector<Input>& gamma,
+				      const double BetaS)
 {
-    Input minValue = std::numeric_limits<Input>::max();
+    Output minValue = std::numeric_limits<Output>::max();
     Input min;
-    for (std::vector<Input>::const_iterator it = gamma.begin(); it != gamma.end(); ++it)
+    for (typename std::vector<Input>::const_iterator it = gamma.begin(); it != gamma.end(); ++it)
     {
 	Input val = ComputeDataTermOnly(V, Ubv, *it);
 	if (val < minValue)
@@ -51,11 +57,11 @@ RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
 
 //From numerical recipies.
 template <typename Input, typename Output>
-Input
+double
 RiceDataTerm<Input,Output>::i0(const Input& x)
 {
-    Input ax,ans;
-    Input y;
+    double ax,ans;
+    double y;
 
     if ((ax=fabs(x)) < 3.75) {
 	y=x/3.75;

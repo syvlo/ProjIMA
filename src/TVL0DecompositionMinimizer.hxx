@@ -73,23 +73,23 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				nodes[current + level * nbPix],
 				INFTY,
-				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level]));
+				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_));
 		else
 		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				nodes[current + level * nbPix],
 				INFTY,
-				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level]));
+				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_));
 	    }
 
     	    //Last one is linked to the source
 	    if (input.type() == CV_8U)
 		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 				DataTerm::Compute(input.at<unsigned char>(i, j),
-						  Alpha_[nbAlpha - 1]), 0);
+						  Alpha_[nbAlpha - 1], Gamma_, BetaS_), 0);
 	    else
 		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 				DataTerm::Compute(input.at<unsigned short>(i, j),
-						  Alpha_[nbAlpha - 1]), 0);
+						  Alpha_[nbAlpha - 1], Gamma_, BetaS_), 0);
 
     	    //////////////////////////////////////////////
             // Links definition for regularization term //
@@ -127,6 +127,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 	      << "Value = " << MaxFlowValue << std::endl;
 
     OutputBV_ = cv::Mat(Height, Width, input.type());
+    OutputS_ = cv::Mat(Height, Width, input.type());
 
     //Construction of the ouput image.
     for (unsigned i = 0; i < Height; ++i)
@@ -149,6 +150,14 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 			OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
 		    else
 			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
+		    if (input.type() == CV_8U)
+			OutputS_.at<unsigned char>(i, j) =
+			    DataTerm::ComputeUs(input.at<unsigned char>(i, j),
+						Alpha_[level], Gamma_, BetaS_);
+		    else
+			OutputS_.at<unsigned short>(i, j) =
+			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),
+						Alpha_[level], Gamma_, BetaS_);
      		    break;
     		}
     	    }

@@ -7,6 +7,7 @@
 #include "TVL0DecompositionMinimizer.hh"
 #include "QuadraticDataTerm.hh"
 #include "RayleighDataTerm.hh"
+#include "RiceDataTerm.hh"
 #include "ImwHelper.hh"
 
 int main (int argc, char* argv[])
@@ -24,25 +25,30 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    //FIX ME
-    //Alpha definition (labels for BV image).
+    //    FIX ME
+    //    Alpha definition (labels for BV image).
     std::vector<unsigned> alpha;
     if (!args.getRadarMode())
-	for (unsigned i = 0; i < 255; ++i)
-	    alpha.push_back(i);
+    	for (unsigned i = 0; i < 255; ++i)
+    	    alpha.push_back(i);
     else
     {
-	for (unsigned i = 0; i < 800; i += 2)
-	    alpha.push_back(i);
-	for (unsigned i = 800; i < 3000; i += 10)
-	    alpha.push_back(i);
+    	// for (unsigned i = 0; i < 800; i += 10)
+    	//     alpha.push_back(i);
+    	// for (unsigned i = 800; i < 3000; i += 100)
+    	//     alpha.push_back(i);
+    	for (unsigned i = 0; i < 3000; i += 30)
+    	    alpha.push_back(i);
     }
 
     //Gamma definition (labels for S image).
-    unsigned gamma_tmp[] = {0, 1, 2};
-    std::vector<unsigned> gamma (gamma_tmp, gamma_tmp + sizeof(gamma_tmp) / sizeof(gamma_tmp));
+    std::vector<unsigned> gamma;
+    for (unsigned i = 0; i < 10000; i += 100)
+    {
+	gamma.push_back(i);
+    }
 
-    TVL0DecompositionMinimizer<RayleighDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+    TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {
@@ -64,7 +70,10 @@ int main (int argc, char* argv[])
 		cv::imwrite(args.getOutputImageBV(), minimizer.getOutputBV());
 	    else
 		WriteImw(minimizer.getOutputBV(), args.getOutputImageBV());
-	    //cv::imwrite(args.getOutputImageS(), minimizer.getOutputS());
+	    if (!args.getRadarMode())
+		cv::imwrite(args.getOutputImageS(), minimizer.getOutputS());
+	    else
+		WriteImw(minimizer.getOutputS(), args.getOutputImageS());
 	}
 	else
 	{
