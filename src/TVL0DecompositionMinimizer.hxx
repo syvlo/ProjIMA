@@ -73,23 +73,23 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				nodes[current + level * nbPix],
 				INFTY,
-				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_));
+				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
 		else
 		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				nodes[current + level * nbPix],
 				INFTY,
-				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_));
+				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
 	    }
 
     	    //Last one is linked to the source
 	    if (input.type() == CV_8U)
 		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 				DataTerm::Compute(input.at<unsigned char>(i, j),
-						  Alpha_[nbAlpha - 1], Gamma_, BetaS_), 0);
+						  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
 	    else
 		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 				DataTerm::Compute(input.at<unsigned short>(i, j),
-						  Alpha_[nbAlpha - 1], Gamma_, BetaS_), 0);
+						  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
 
     	    //////////////////////////////////////////////
             // Links definition for regularization term //
@@ -101,8 +101,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     		    double beta = BetaBV_;
     		    g->add_edge(nodes[current + (level - 1) * nbPix],
     			       nodes[current + (level - 1) * nbPix + 1],
-				beta * (Alpha_[level] - Alpha_[level - 1]),
-				beta * (Alpha_[level] - Alpha_[level - 1]));
+				beta,
+				beta);
     		}
 
     	    //Southern neighbour
@@ -113,8 +113,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     		    g->add_edge(nodes[current + (level - 1) * nbPix],
 				//Ou + Height comme dans TP ?
     				nodes[current + (level - 1) * nbPix + Width],
-    				beta * (Alpha_[level] - Alpha_[level - 1]),
-				beta * (Alpha_[level] - Alpha_[level - 1]));
+    				beta,
+				beta);
     		}
     	}
     }
@@ -144,29 +144,29 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 
     	    for (unsigned level = nbAlpha - 1; level >= 1; --level)
     	    {
-    		if (g->what_segment(nodes[current + (level - 1) * nbPix])
+    		if (g->what_segment(nodes[current + (level) * nbPix])
     		    != Graph::SOURCE)
     		{
 		    if (input.type() == CV_8U)
+		    {
 			OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
-		    else
-			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
-		    if (input.type() == CV_8U)
 			OutputS_.at<unsigned char>(i, j) =
 			    DataTerm::ComputeUs(input.at<unsigned char>(i, j),
-						Alpha_[level], Gamma_, BetaS_);
-		    else
-			OutputS_.at<unsigned short>(i, j) =
-			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),
-						Alpha_[level], Gamma_, BetaS_);
-		    if (input.type() == CV_8U)
+						Alpha_[level], Gamma_, BetaS_, BetaBV_);
 			OutputComplete_.at<unsigned char>(i, j) =
 			    OutputBV_.at<unsigned char>(i, j)
 			    + OutputS_.at<unsigned char>(i, j);
+		    }
 		    else
+		    {
+			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
+			OutputS_.at<unsigned short>(i, j) =
+			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),
+						Alpha_[level], Gamma_, BetaS_, BetaBV_);
 			OutputComplete_.at<unsigned short>(i, j) =
 			    OutputBV_.at<unsigned short>(i, j)
 			    + OutputS_.at<unsigned short>(i, j);
+		    }
      		    break;
     		}
     	    }

@@ -10,12 +10,15 @@ Output
 RiceDataTerm<Input,Output>::Compute(const Input& V,
 				    const Input& Ubv,
 				    const std::vector<Input>& gamma,
-				    const double BetaS)
+				    const double BetaS,
+				    const double BetaBV)
 {
-    Input Us = RiceDataTerm<Input,Output>::ComputeUs(V, Ubv, gamma, BetaS);
-    Output res = ComputeDataTermOnly(V, Ubv, Us);
+    Input Us = RiceDataTerm<Input,Output>::ComputeUs(V, Ubv, gamma, BetaS, BetaBV);
+
+    if (Us == 0)
+	return ComputeDataTermOnly(V, Ubv, Us, BetaBV);
     //    std::cout << "Pour V = " << V << ", Ubv = " << Ubv << ", res = " << res << std::endl;
-    return res;
+    return BetaS/BetaBV;
 }
 
 
@@ -23,11 +26,15 @@ template <typename Input, typename Output>
 Output
 RiceDataTerm<Input,Output>::ComputeDataTermOnly(const Input& V,
 						const Input& Ubv,
-						const Input& Us)
+						const Input& Us,
+						const double BetaBV)
 {
-    return static_cast<Output> ((V * V + Us * Us) / (2 * Ubv * Ubv)
-				+ 2 * log(Ubv)
-				- log(i0(V * Us / (Ubv * Ubv))));
+    if (Us != 0)
+	return static_cast<Output> ((V * V + Us * Us) / (Ubv * Ubv)
+				    + 2 * log(Ubv)
+				    - log(i0(2 * V * Us / (Ubv * Ubv)))) / BetaBV;
+    else
+	return static_cast<Output> ((V * V) / (Ubv * Ubv) + 2 * log(Ubv)) / BetaBV;
 }
 
 template <typename Input, typename Output>
@@ -35,13 +42,19 @@ Input
 RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
 				      const Input& Ubv,
 				      const std::vector<Input>& gamma,
-				      const double BetaS)
+				      const double BetaS,
+				      const double BetaBV)
 {
     Output minValue = std::numeric_limits<Output>::max();
+
+    Output tmp = ComputeDataTermOnly(V, Ubv, 0, BetaBV);
+    if (tmp < BetaS / BetaBV)
+	return 0;
+
     Input min;
     for (typename std::vector<Input>::const_iterator it = gamma.begin(); it != gamma.end(); ++it)
     {
-	Input val = ComputeDataTermOnly(V, Ubv, *it);
+	Input val = ComputeDataTermOnly(V, Ubv, *it, BetaBV);
 	if (val < minValue)
 	{
 	    minValue = val;
@@ -49,7 +62,7 @@ RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
 	}
     }
 
-    if (minValue + BetaS < ComputeDataTermOnly(V, Ubv, 0))
+    if (minValue + BetaS < ComputeDataTermOnly(V, Ubv, 0, BetaBV))
 	return min;
     else
 	return 0;

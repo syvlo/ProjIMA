@@ -23,6 +23,11 @@ int main (int argc, char* argv[])
 	return (1);
     }
 
+    cv::Mat tmp = ReadImw("test");
+    cv::Rect roi (100, 100, 300, 300);
+    cv::Mat cropped = tmp(roi).clone();
+    WriteImw(cropped, "cropped");
+
     std::cout << args << std::endl;
 
     //    FIX ME
