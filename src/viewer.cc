@@ -86,7 +86,7 @@ int main (int argc, char* argv[])
     else
     {
 	unsigned height = img1_8U.size().height;
-	if (img2_8U.size().height > height)
+	if ((unsigned)img2_8U.size().height > height)
 	    height = img2_8U.size().height;
 
 	unsigned width = img1_8U.size().width + img2_8U.size().width + BORDER;
