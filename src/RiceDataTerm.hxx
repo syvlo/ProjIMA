@@ -29,12 +29,12 @@ RiceDataTerm<Input,Output>::ComputeDataTermOnly(const Input& V,
 						const Input& Us,
 						const double BetaBV)
 {
-    if (Us != 0)
-	return static_cast<Output> ((V * V + Us * Us) / (Ubv * Ubv)
-				    + 2 * log(Ubv)
-				    - log(i0(2 * V * Us / (Ubv * Ubv)))) / BetaBV;
-    else
-	return static_cast<Output> ((V * V) / (Ubv * Ubv) + 2 * log(Ubv)) / BetaBV;
+    // if (Us != 0)
+	// return static_cast<Output> ((V * V + Us * Us) / (Ubv * Ubv)
+	// 			    + 2 * log(Ubv)
+	// 			    - log(i0(2 * V * Us / (Ubv * Ubv)))) / BetaBV;
+    // else
+  return static_cast<Output> ((V * V) / ((Us + Ubv) * (Us + Ubv)) + 2 * log(Ubv + Us)) / BetaBV;
 }
 
 template <typename Input, typename Output>
