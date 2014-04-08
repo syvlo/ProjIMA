@@ -13,14 +13,14 @@
 
 template <typename DataTerm>
 TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma)
-  : BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma)
+	: BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma)
 {
 }
 
 template <typename DataTerm>
 TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma, double BetaBV, double BetaS)
     : BetaBV_(BetaBV), BetaS_(BetaS), Alpha_(alpha), Gamma_(gamma)
-{   
+{
 }
 
 template <typename DataTerm>
@@ -47,7 +47,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 
     //Creation of the nodes.
     for (unsigned i = 0; i < nbNodes; ++i)
-      nodes[i] = g->add_node();
+		nodes[i] = g->add_node();
 
     //Links definition
     for (unsigned i = 0; i < Height; ++i)
@@ -68,54 +68,54 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 
     	    //Every level (except last one) is linked to the one above it.
     	    for (unsigned level = 1; level < nbAlpha; ++level)
-	    {
-		if (input.type() == CV_8U)
-		    g->add_edge(nodes[current + (level - 1) * nbPix],
-				nodes[current + level * nbPix],
-				INFTY,
-				DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
-		else
-		    g->add_edge(nodes[current + (level - 1) * nbPix],
-				nodes[current + level * nbPix],
-				INFTY,
-				DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
-	    }
+			{
+				if (input.type() == CV_8U)
+					g->add_edge(nodes[current + (level - 1) * nbPix],
+								nodes[current + level * nbPix],
+								INFTY,
+								DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+				else
+					g->add_edge(nodes[current + (level - 1) * nbPix],
+								nodes[current + level * nbPix],
+								INFTY,
+								DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+			}
 
     	    //Last one is linked to the source
-	    if (input.type() == CV_8U)
-		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-				DataTerm::Compute(input.at<unsigned char>(i, j),
-						  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
-	    else
-		g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-				DataTerm::Compute(input.at<unsigned short>(i, j),
-						  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
+			if (input.type() == CV_8U)
+				g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+								DataTerm::Compute(input.at<unsigned char>(i, j),
+												  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
+			else
+				g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+								DataTerm::Compute(input.at<unsigned short>(i, j),
+												  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
 
     	    //////////////////////////////////////////////
             // Links definition for regularization term //
             //////////////////////////////////////////////
     	    //Eastern neighbour
     	    if (j < Width - 1)
-    		for (unsigned level = 1; level <= nbAlpha; ++level)
-    		{
-    		    double beta = BetaBV_;
-    		    g->add_edge(nodes[current + (level - 1) * nbPix],
-    			       nodes[current + (level - 1) * nbPix + 1],
-				beta,
-				beta);
-    		}
+				for (unsigned level = 1; level <= nbAlpha; ++level)
+				{
+					double beta = BetaBV_;
+					g->add_edge(nodes[current + (level - 1) * nbPix],
+								nodes[current + (level - 1) * nbPix + 1],
+								beta,
+								beta);
+				}
 
     	    //Southern neighbour
     	    if (i < Height - 1)
-    		for (unsigned level = 1; level <= nbAlpha; ++level)
-    		{
-    		  double beta = BetaBV_;
-    		    g->add_edge(nodes[current + (level - 1) * nbPix],
-				//Ou + Height comme dans TP ?
-    				nodes[current + (level - 1) * nbPix + Height],
-    				beta,
-				beta);
-    		}
+				for (unsigned level = 1; level <= nbAlpha; ++level)
+				{
+					double beta = BetaBV_;
+					g->add_edge(nodes[current + (level - 1) * nbPix],
+								//Ou + Height comme dans TP ?
+								nodes[current + (level - 1) * nbPix + Height],
+								beta,
+								beta);
+				}
     	}
     }
 
@@ -124,7 +124,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     //Computation of max flow.
     double MaxFlowValue = g->maxflow();
     std::clog << " done." << std::endl
-	      << "Value = " << MaxFlowValue << std::endl;
+			  << "Value = " << MaxFlowValue << std::endl;
 
     OutputBV_ = cv::Mat(Height, Width, input.type());
     OutputS_ = cv::Mat(Height, Width, input.type());
@@ -137,42 +137,38 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     	for (unsigned j = 0; j < Width; ++j)
     	{
     	    unsigned current = offset + j;
-	    if (input.type() == CV_8U)
-		OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
-	    else
-		OutputBV_.at<unsigned short>(i, j) = Alpha_[0];
+			if (input.type() == CV_8U)
+				OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
+			else
+				OutputBV_.at<unsigned short>(i, j) = Alpha_[0];
 
     	    for (unsigned level = nbAlpha - 1; level >= 1; --level)
     	    {
-    		if (g->what_segment(nodes[current + (level) * nbPix])
-    		    != Graph::SOURCE)
-    		{
-		    if (input.type() == CV_8U)
-		    {
-			OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
-			OutputS_.at<unsigned char>(i, j) =
-			    DataTerm::ComputeUs(input.at<unsigned char>(i, j),
-						Alpha_[level], Gamma_, BetaS_, BetaBV_);
-			OutputComplete_.at<unsigned char>(i, j) =
-			    OutputBV_.at<unsigned char>(i, j)
-			    + OutputS_.at<unsigned char>(i, j);
-		    }
-		    else
-		    {
-		      //Debug
-		      if (input.at<unsigned short>(i, j) == 48634)
-			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
-
-			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
-			OutputS_.at<unsigned short>(i, j) =
-			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),
-						Alpha_[level], Gamma_, BetaS_, BetaBV_);
-			OutputComplete_.at<unsigned short>(i, j) =
-			    OutputBV_.at<unsigned short>(i, j)
-			    + OutputS_.at<unsigned short>(i, j);
-		    }
-     		    break;
-    		}
+				if (g->what_segment(nodes[current + (level) * nbPix])
+					!= Graph::SOURCE)
+				{
+					if (input.type() == CV_8U)
+					{
+						OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
+						OutputS_.at<unsigned char>(i, j) =
+							DataTerm::ComputeUs(input.at<unsigned char>(i, j),
+												Alpha_[level], Gamma_, BetaS_, BetaBV_);
+						OutputComplete_.at<unsigned char>(i, j) =
+							OutputBV_.at<unsigned char>(i, j)
+							+ OutputS_.at<unsigned char>(i, j);
+					}
+					else
+					{
+						OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
+						OutputS_.at<unsigned short>(i, j) =
+							DataTerm::ComputeUs(input.at<unsigned short>(i, j),
+												Alpha_[level], Gamma_, BetaS_, BetaBV_);
+						OutputComplete_.at<unsigned short>(i, j) =
+							OutputBV_.at<unsigned short>(i, j)
+							+ OutputS_.at<unsigned short>(i, j);
+					}
+					break;
+				}
     	    }
     	}
     }
