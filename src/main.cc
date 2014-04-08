@@ -47,6 +47,10 @@ int main (int argc, char* argv[])
     {
 	gamma.push_back(i);
     }
+    for (unsigned i = 10000; i < 100000; i += 1000)
+    {
+	gamma.push_back(i);
+    }
 
     TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 

@@ -6,7 +6,7 @@
 # include <limits>
 
 template <typename Input, typename Output>
-Output
+double
 RiceDataTerm<Input,Output>::Compute(const Input& V,
 				    const Input& Ubv,
 				    const std::vector<Input>& gamma,
@@ -23,7 +23,7 @@ RiceDataTerm<Input,Output>::Compute(const Input& V,
 
 
 template <typename Input, typename Output>
-Output
+double
 RiceDataTerm<Input,Output>::ComputeDataTermOnly(const Input& V,
 						const Input& Ubv,
 						const Input& Us,
@@ -34,27 +34,27 @@ RiceDataTerm<Input,Output>::ComputeDataTermOnly(const Input& V,
 	// 			    + 2 * log(Ubv)
 	// 			    - log(i0(2 * V * Us / (Ubv * Ubv)))) / BetaBV;
     // else
-  return static_cast<Output> ((V * V) / ((Us + Ubv) * (Us + Ubv)) + 2 * log(Ubv + Us)) / BetaBV;
+  return (((double)V * (double)V) / (((double)Us + (double)Ubv) * ((double)Us + (double)Ubv)) + 2 * log((double)Ubv + (double)Us)) / BetaBV;
 }
 
 template <typename Input, typename Output>
-Input
+Output
 RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
 				      const Input& Ubv,
 				      const std::vector<Input>& gamma,
 				      const double BetaS,
 				      const double BetaBV)
 {
-    Output minValue = std::numeric_limits<Output>::max();
+    double minValue = std::numeric_limits<double>::max();
 
-    Output tmp = ComputeDataTermOnly(V, Ubv, 0, BetaBV);
+    double tmp = ComputeDataTermOnly(V, Ubv, 0, BetaBV);
     if (tmp < BetaS / BetaBV)
 	return 0;
 
-    Input min;
+    Output min;
     for (typename std::vector<Input>::const_iterator it = gamma.begin(); it != gamma.end(); ++it)
     {
-	Input val = ComputeDataTermOnly(V, Ubv, *it, BetaBV);
+	double val = ComputeDataTermOnly(V, Ubv, *it, BetaBV);
 	if (val < minValue)
 	{
 	    minValue = val;

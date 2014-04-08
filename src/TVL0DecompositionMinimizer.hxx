@@ -159,6 +159,10 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 		    }
 		    else
 		    {
+		      //Debug
+		      if (input.at<unsigned short>(i, j) == 48634)
+			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
+
 			OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
 			OutputS_.at<unsigned short>(i, j) =
 			    DataTerm::ComputeUs(input.at<unsigned short>(i, j),

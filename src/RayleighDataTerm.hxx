@@ -1,6 +1,5 @@
 #ifndef RAYLEIGH_DATA_TERM_HXX_
 # define RAYLEIGH_DATA_TERM_HXX_
-
 #include "RayleighDataTerm.hh"
 #include <cmath>
 
