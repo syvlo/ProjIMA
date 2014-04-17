@@ -23,22 +23,22 @@ Args::Args (int argc, char* argv[])
 	    BetaS_ = atof(argv[++i]);
 	else if (!strcmp("-i", argv[i]) || !strcmp("--InputImage", argv[i]))
 	{
-	    InputImage_ = new char[strlen(argv[++i])];
+	    InputImage_ = new char[strlen(argv[++i]) + 1];
 	    std::strcpy(InputImage_, argv[i]);
 	}
 	else if (!strcmp("-oBV", argv[i]) || !strcmp("--OutputImageBV", argv[i]))
 	{
-	    OutputImageBV_ = new char[strlen(argv[++i])];
+	    OutputImageBV_ = new char[strlen(argv[++i]) + 1];
 	    std::strcpy(OutputImageBV_, argv[i]);
 	}
 	else if (!strcmp("-oS", argv[i]) || !strcmp("--OutputImageS", argv[i]))
 	{
-	    OutputImageS_ = new char[strlen(argv[++i])];
+	    OutputImageS_ = new char[strlen(argv[++i]) + 1];
 	    std::strcpy(OutputImageS_, argv[i]);
 	}
 	else if (!strcmp("-oC", argv[i]) || !strcmp("--OutputImageComplete", argv[i]))
 	{
-	    OutputImageComplete_ = new char[strlen(argv[++i])];
+	    OutputImageComplete_ = new char[strlen(argv[++i]) + 1];
 	    std::strcpy(OutputImageComplete_, argv[i]);
 	}
 	else if (!strcmp("-w", argv[i]) || !strcmp("--Window", argv[i]))

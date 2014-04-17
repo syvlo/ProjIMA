@@ -8,6 +8,7 @@
 #include "QuadraticDataTerm.hh"
 #include "RayleighDataTerm.hh"
 #include "RiceDataTerm.hh"
+#include "LogDataTerm.hh"
 #include "ImwHelper.hh"
 
 int main (int argc, char* argv[])
@@ -37,8 +38,15 @@ int main (int argc, char* argv[])
     	//     alpha.push_back(i);
     	// for (unsigned i = 800; i < 3000; i += 100)
     	//     alpha.push_back(i);
-    	for (unsigned i = 0; i < 1000; i += 30)
-    	    alpha.push_back(i);
+
+    	// for (unsigned i = 0; i < 1000; i += 30)
+    	//     alpha.push_back(i);
+		for (unsigned i = 0; i < 500; i+= 100)
+			alpha.push_back(i);
+		for (unsigned i = 500; i < 1500; i += 40)
+			alpha.push_back(i);
+		for (unsigned i = 1500; i < 2000; i += 100)
+			alpha.push_back(i);
     }
 
     //Gamma definition (labels for S image).
@@ -52,7 +60,7 @@ int main (int argc, char* argv[])
 	gamma.push_back(i);
     }
 
-    TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+    TVL0DecompositionMinimizer<LogDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {
