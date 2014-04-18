@@ -27,27 +27,27 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    //    FIX ME
-    //    Alpha definition (labels for BV image).
+    //Alpha definition (labels for BV image).
     std::vector<unsigned> alpha;
     if (!args.getRadarMode())
     	for (unsigned i = 0; i < 255; ++i)
     	    alpha.push_back(i);
     else
     {
-    	for (unsigned i = 0; i < 800; i += 40)
-    	    alpha.push_back(i);
-    	for (unsigned i = 800; i < 3000; i += 100)
-    	    alpha.push_back(i);
+		//For almost all radar distribution, this should be used.
+    	// for (unsigned i = 0; i < 800; i += 40)
+    	//     alpha.push_back(i);
+    	// for (unsigned i = 800; i < 3000; i += 100)
+    	//     alpha.push_back(i);
 
-    	// // for (unsigned i = 0; i < 1000; i += 30)
-    	// //     alpha.push_back(i);
-		// for (unsigned i = 0; i < 500; i+= 100)
-		// 	alpha.push_back(i);
-		// for (unsigned i = 500; i < 1500; i += 40)
-		// 	alpha.push_back(i);
-		// for (unsigned i = 1500; i < 2000; i += 100)
-		// 	alpha.push_back(i);
+
+		//For a log (* 100) distribution
+		for (unsigned i = 0; i < 500; i+= 100)
+			alpha.push_back(i);
+		for (unsigned i = 500; i < 1500; i += 40)
+			alpha.push_back(i);
+		for (unsigned i = 1500; i < 2000; i += 100)
+			alpha.push_back(i);
     }
 
     //Gamma definition (labels for S image).
@@ -61,7 +61,7 @@ int main (int argc, char* argv[])
 		gamma.push_back(i);
     }
 
-    TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+    TVL0DecompositionMinimizer<LogDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
     if (args.getWindowMode())
     {
@@ -76,6 +76,12 @@ int main (int argc, char* argv[])
 			input = cv::imread(args.getInputImage(), CV_LOAD_IMAGE_GRAYSCALE);
 		else
 			input = ReadImw(args.getInputImage());
+
+		unsigned nbNodes = input.size().width * input.size().height * alpha.size() + 2;
+		unsigned nbArcs = 6 * nbNodes;
+		unsigned nbBytes = (nbNodes + nbArcs) * 8; //Weights in double.
+		std::clog << "Éstimation de la mémoire pour la construction du graph: "
+				  << nbBytes / 1024 << "Mo" << std::endl;
 
 		if (minimizer.compute(input))
 		{
