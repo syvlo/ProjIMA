@@ -112,7 +112,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
 					double beta = BetaBV_;
 					g->add_edge(nodes[current + (level - 1) * nbPix],
 								//Ou + Height comme dans TP ?
-								nodes[current + (level - 1) * nbPix + Height],
+								nodes[current + (level - 1) * nbPix + Width],
 								beta,
 								beta);
 				}
