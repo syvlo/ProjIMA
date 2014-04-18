@@ -13,7 +13,7 @@ RayleighDataTerm2Vars<Input,Output>::Compute(const Input& V,
 											 const double BetaS,
 											 const double BetaBV)
 {
-	if (V >= Ubv)
+	if (V <= Ubv)
 	{
 		Input Us = 0;
 		return ComputeDataTermOnly(V, Ubv, Us, BetaBV);
