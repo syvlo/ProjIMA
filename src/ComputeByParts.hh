@@ -29,23 +29,80 @@ template <typename Minimizer>
 class ComputeByParts
 {
 public:
+	/**
+	 * \brief	Constructor.
+	 * \param	computeSize		Size of one side of the window used for
+	 *							computation.
+	 * \param	fillSize		Size of one side of the window used for
+	 *							filling.
+	 * \param	minimizer		The minimizer used to compute one bloc.
+	 */
     ComputeByParts(unsigned computeSize, unsigned fillSize, Minimizer& minimizer);
 
+	/**
+	 * \brief	Destructor
+	 */
     ~ComputeByParts();
 
+	/**
+	 * \brief Method that split the image in blocks and find the optimum
+	 *			on each one of them.
+	 * \param	input	The input image.
+	 * \return	true if everything went OK, false otherwise.
+	 */
     bool compute(const cv::Mat& input);
 
+	/**
+	 * \brief Return the Bounded variations image.
+	 * \return	The image.
+	 */
     const cv::Mat& getOutputBV() const;
+
+	/**
+	 * \brief Return the scaterers image.
+	 * \return	The image.
+	 */
     const cv::Mat& getOutputS() const;
+
+	/**
+	 * \brief Return the complete image.
+	 * \return	The image.
+	 */
     const cv::Mat& getOutputC() const;
+
+
 private:
+	/**
+	 * Size of one side of the window used for computation.
+	 */
     unsigned computeSize_;
+
+	/**
+	 * Size of one side of the window used for filling.
+	 */
     unsigned fillSize_;
+
+	/**
+	 * Minimizer used to get the optimum on one block.
+	 */
     Minimizer& minimizer_;
+
+	/**
+	 * Bounded variations image
+	 */
     cv::Mat OutputBV_;
+
+    /**
+	 * Scaterers image.
+	 */
     cv::Mat OutputS_;
+
+	/**
+	 * Complete image.
+	 */
     cv::Mat OutputC_;
 
+	//Shoudl not use default constructor.
     ComputeByParts();
 };
 
