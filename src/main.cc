@@ -5,6 +5,7 @@
 
 #include "Args.hh"
 #include "TVL0DecompositionMinimizer.hh"
+#include "ComputeByParts.hh"
 #include "QuadraticDataTerm.hh"
 #include "RayleighDataTerm.hh"
 #include "RayleighDataTerm2Vars.hh"
@@ -85,88 +86,24 @@ int main (int argc, char* argv[])
 		std::clog << "Éstimation de la mémoire pour la construction du graph: "
 				  << nbBytes / (1024 * 1024) << "Mo" << std::endl;
 
-		cv::Mat outputBV(input.size(), input.type());
-		cv::Mat outputS(input.size(), input.type());
-		cv::Mat outputC(input.size(), input.type());
-
-		for (int i = 0; i < input.size().height - FILL_WINDOW_SIZE;
-			 i += FILL_WINDOW_SIZE)
-		{
-			for (int j = 0; j < input.size().width - FILL_WINDOW_SIZE;
-				 j += FILL_WINDOW_SIZE)
-			{
-				int endi = i + COMPUTE_WINDOW_SIZE;
-				if (endi >= input.size().height)
-					endi = input.size().height - 1;
-				int endj = j + COMPUTE_WINDOW_SIZE;
-				if (endj >= input.size().width)
-					endj = input.size().width - 1;
-
-				cv::Rect ComputeRegion(j, i, endj - j, endi - i);
-				cv::Mat inputCropped = input(ComputeRegion);
-
-
-				int startIFill = i + (COMPUTE_WINDOW_SIZE - FILL_WINDOW_SIZE) / 2;
-				if (i == 0)
-					startIFill = 0;
-				int endIFill = i + (COMPUTE_WINDOW_SIZE + FILL_WINDOW_SIZE) / 2;
-				if (endi == input.size().height - 1)
-					endIFill = input.size().height - 1;
-
-				int startJFill = j + (COMPUTE_WINDOW_SIZE - FILL_WINDOW_SIZE) / 2;
-				if (j == 0)
-					startJFill = 0;
-				int endJFill = j + (COMPUTE_WINDOW_SIZE + FILL_WINDOW_SIZE) / 2;
-				if (endj == input.size().width - 1)
-					endJFill = input.size().width - 1;
-				std::clog << "Compute on rectangle from (" << i << ", " << j << ") to ("
-						  << endi << ", " << endj << ")" << std::endl;
-				std::clog << "And filling from (" << startIFill << ", " << startJFill
-						  << ") to (" << endIFill << ", " << endJFill << ")" << std::endl;
-
-				cv::Rect FillRegion(startJFill, startIFill, endJFill - startJFill,
-									endIFill - startIFill);
-
-				TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
-				if (minimizer.compute(inputCropped))
-				{
-					for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
-						for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
-						{
-							outputBV.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputBV().at<unsigned short>(tmp_i - i, tmp_j - j);
-							outputS.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputS().at<unsigned short>(tmp_i - i, tmp_j - j);
-							outputC.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputComplete().at<unsigned short>(tmp_i - i, tmp_j - j);
-						}
-					WriteImw(minimizer.getOutputBV(), "test");
-					// cv::Mat oBV(outputBV, FillRegion);
-					// minimizer.getOutputBV().copyTo(oBV);
-					WriteImw(outputBV, "test2");
-					// outputS(FillRegion) = minimizer.getOutputS();
-					// outputC(FillRegion) = minimizer.getOutputComplete();
-				}
-				else
-				{
-					std::cerr << "Something wrong happened during computation." << std::endl;
-					return (1);
-				}
-
-			}
-		}
+		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+		ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
+		computer.compute(input);
 
 		if (!args.getRadarMode())
-			cv::imwrite(args.getOutputImageBV(), outputBV);
+		    cv::imwrite(args.getOutputImageBV(), computer.getOutputBV());
 		else
-			WriteImw(outputBV, args.getOutputImageBV());
+		    WriteImw(computer.getOutputBV(), args.getOutputImageBV());
 		if (!args.getRadarMode())
-			cv::imwrite(args.getOutputImageS(), outputS);
+		    cv::imwrite(args.getOutputImageS(), computer.getOutputS());
 		else
-			WriteImw(outputS, args.getOutputImageS());
+		    WriteImw(computer.getOutputS(), args.getOutputImageS());
 		if (args.getOutputImageComplete())
 		{
-			if (!args.getRadarMode())
-				cv::imwrite(args.getOutputImageComplete(), outputC);
-			else
-				WriteImw(outputC, args.getOutputImageComplete());
+		    if (!args.getRadarMode())
+			cv::imwrite(args.getOutputImageComplete(), computer.getOutputC());
+		    else
+			WriteImw(computer.getOutputC(), args.getOutputImageComplete());
 		}
 
 
