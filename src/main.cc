@@ -130,12 +130,19 @@ int main (int argc, char* argv[])
 				TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 				if (minimizer.compute(inputCropped))
 				{
+					for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
+						for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
+						{
+							outputBV.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputBV().at<unsigned short>(tmp_i - i, tmp_j - j);
+							outputS.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputS().at<unsigned short>(tmp_i - i, tmp_j - j);
+							outputC.at<unsigned short>(tmp_i, tmp_j) = minimizer.getOutputComplete().at<unsigned short>(tmp_i - i, tmp_j - j);
+						}
 					WriteImw(minimizer.getOutputBV(), "test");
-					cv::Mat oBV(outputBV, FillRegion);
-					minimizer.getOutputBV().copyTo(oBV);
+					// cv::Mat oBV(outputBV, FillRegion);
+					// minimizer.getOutputBV().copyTo(oBV);
 					WriteImw(outputBV, "test2");
-					outputS(FillRegion) = minimizer.getOutputS();
-					outputC(FillRegion) = minimizer.getOutputComplete();
+					// outputS(FillRegion) = minimizer.getOutputS();
+					// outputC(FillRegion) = minimizer.getOutputComplete();
 				}
 				else
 				{
