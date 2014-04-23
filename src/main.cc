@@ -13,9 +13,6 @@
 #include "LogDataTerm.hh"
 #include "ImwHelper.hh"
 
-#define COMPUTE_WINDOW_SIZE (100)
-#define FILL_WINDOW_SIZE (50)
-
 int main (int argc, char* argv[])
 {
     Args args(argc, argv);
@@ -80,30 +77,44 @@ int main (int argc, char* argv[])
 		else
 			input = ReadImw(args.getInputImage());
 
-		unsigned nbNodes = input.size().width * input.size().height * alpha.size() + 2;
-		unsigned nbArcs = 6 * nbNodes;
-		unsigned nbBytes = (nbNodes + nbArcs) * 8; //Weights in double.
-		std::clog << "Éstimation de la mémoire pour la construction du graph: "
-				  << nbBytes / (1024 * 1024) << "Mo" << std::endl;
+		cv::Mat OutputBV;
+		cv::Mat OutputS;
+		cv::Mat OutputC;
 
 		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
-		ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
-		computer.compute(input);
+
+		if (args.getNonOptimalMode())
+		{
+			ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
+			computer.compute(input);
+
+			OutputBV = computer.getOutputBV();
+			OutputS = computer.getOutputS();
+			OutputC = computer.getOutputC();
+		}
+		else
+		{
+			minimizer.compute(input);
+
+			OutputBV = minimizer.getOutputBV();
+			OutputS = minimizer.getOutputS();
+			OutputC = minimizer.getOutputComplete();
+		}
 
 		if (!args.getRadarMode())
-		    cv::imwrite(args.getOutputImageBV(), computer.getOutputBV());
+		    cv::imwrite(args.getOutputImageBV(), OutputBV);
 		else
-		    WriteImw(computer.getOutputBV(), args.getOutputImageBV());
+		    WriteImw(OutputBV, args.getOutputImageBV());
 		if (!args.getRadarMode())
-		    cv::imwrite(args.getOutputImageS(), computer.getOutputS());
+		    cv::imwrite(args.getOutputImageS(), OutputS);
 		else
-		    WriteImw(computer.getOutputS(), args.getOutputImageS());
+		    WriteImw(OutputS, args.getOutputImageS());
 		if (args.getOutputImageComplete())
 		{
 		    if (!args.getRadarMode())
-			cv::imwrite(args.getOutputImageComplete(), computer.getOutputC());
+			cv::imwrite(args.getOutputImageComplete(), OutputC);
 		    else
-			WriteImw(computer.getOutputC(), args.getOutputImageComplete());
+				WriteImw(OutputC, args.getOutputImageComplete());
 		}
 
 

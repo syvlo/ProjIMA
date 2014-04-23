@@ -13,6 +13,9 @@ Args::Args (int argc, char* argv[])
     BetaBV_ = DEFAULT_BS;
     WindowMode_ = DEFAULT_WINDOW_MODE;
     RadarMode_ = DEFAULT_RADAR_MODE;
+    NonOptimalMode_ = DEFAULT_NON_OPTIMAL_MODE;
+	ComputeWindowSize_ = DEFAULT_COMPUTE_WINDOW_SIZE;
+	FillingWindowSize_ = DEFAULT_FILLING_WINDOW_SIZE;
     Help_ = false;
 
     for (int i = 1; i < argc; ++i)
@@ -45,6 +48,12 @@ Args::Args (int argc, char* argv[])
 	    WindowMode_ = true;
 	else if (!strcmp("-r", argv[i]) || !strcmp("--Radar", argv[i]))
 	    RadarMode_ = true;
+	else if (!strcmp("-no", argv[i]) || !strcmp("--NonOptimal", argv[i]))
+	    NonOptimalMode_ = true;
+	else if (!strcmp("-cw", argv[i]) || !strcmp("--ComputeWindow", argv[i]))
+	    ComputeWindowSize_ = atoi(argv[++i]);
+	else if (!strcmp("-fw", argv[i]) || !strcmp("--FillingWindow", argv[i]))
+	    FillingWindowSize_ = atoi(argv[++i]);
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
 	    printHelp();
@@ -79,15 +88,18 @@ void
 Args::printHelp() const
 {
     std::cout << "Available parameters:" << std::endl
-	      << "* -BBV/--BetaBV <value>, BetaBV;" << std::endl
-	      << "* -BS/--BetaS <value>, BetaS;" << std::endl
-	      << "* -i/--InputImage <value>, image to be denoised;" << std::endl
-	      << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
-	      << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
-	      << "* -oC/--OutputImageComplete <value>, image to store the denoised image;" << std::endl
-	      << "* -w/--Window, switch to window mode;" << std::endl
-	      << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
-	      << "* -h/--help, print this message;" << std::endl;
+			  << "* -BBV/--BetaBV <value>, BetaBV;" << std::endl
+			  << "* -BS/--BetaS <value>, BetaS;" << std::endl
+			  << "* -i/--InputImage <value>, image to be denoised;" << std::endl
+			  << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
+			  << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
+			  << "* -oC/--OutputImageComplete <value>, image to store the denoised image;" << std::endl
+			  << "* -w/--Window, switch to window mode;" << std::endl
+			  << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
+			  << "* -no/--NonOptimal, switch to non optimal mode (for large images.)" << std::endl
+			  << "* -cw/--ComputeWindow, size of the window used for computations in non optimal mode." << std::endl
+			  << "* -fw/--FillingWindow, size of the window used for filling in non optimal mode." << std::endl
+			  << "* -h/--help, print this message;" << std::endl;
 }
 
 bool
@@ -144,6 +156,25 @@ Args::getRadarMode() const
     return RadarMode_;
 }
 
+bool
+Args::getNonOptimalMode() const
+{
+    return NonOptimalMode_;
+}
+
+unsigned
+Args::getComputeWindowSize() const
+{
+	return ComputeWindowSize_;
+}
+
+unsigned
+Args::getFillingWindowSize() const
+{
+	return FillingWindowSize_;
+}
+
+
 std::ostream&
 operator<< (std::ostream& stream, const Args& args)
 {
@@ -158,7 +189,16 @@ operator<< (std::ostream& stream, const Args& args)
     if (args.OutputImageComplete_)
 	stream << "OutputImageComplete = " << args.OutputImageComplete_ << "," << std::endl;
     stream << "Window Mode = " << args.WindowMode_ << std::endl;
-    stream << "Radar Mode = " << args.RadarMode_;
+    stream << "Radar Mode = " << args.RadarMode_ << std::endl;
+	stream << "Non optimal Mode = " << args.NonOptimalMode_;
+	if (args.NonOptimalMode_)
+	{
+		stream << std::endl << "Compute window size = "
+			   << args.ComputeWindowSize_ << std::endl;
+		stream << "Filling window size = "
+			   << args.FillingWindowSize_;
+	}
+
     return stream;
 }
 

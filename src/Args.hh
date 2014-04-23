@@ -31,6 +31,21 @@
 # define DEFAULT_RADAR_MODE (false)
 
 /**
+ * Default value for NonOptimalMode
+ */
+# define DEFAULT_NON_OPTIMAL_MODE (false)
+
+/**
+ * Default value for the size of the compute window.
+ */
+# define DEFAULT_COMPUTE_WINDOW_SIZE (100)
+
+/**
+ * Default value for the size of the filling window.
+ */
+# define DEFAULT_FILLING_WINDOW_SIZE (50)
+
+/**
  * \class Args
  * \brief Defines program arguments and handle them.
  */
@@ -41,7 +56,7 @@ public:
      * \brief		Constructor.
      * \details		Parse programm arguments and store them.
      * \param		argc	Number of arguments.
-     * \param		argv	Arguments.		
+     * \param		argv	Arguments.
      */
     Args (int argc, char* argv[]);
 
@@ -114,6 +129,24 @@ public:
      */
     bool getRadarMode() const;
 
+	/**
+	 * \brief		Getter for the non optimal mode.
+	 * \return	    true if non optimal is set.
+	 */
+	bool getNonOptimalMode() const;
+
+	/**
+	 * \brief		Getter for the size of the compute window.
+	 * \return		The size of the compute window.
+	 */
+	unsigned getComputeWindowSize() const;
+
+	/**
+	 * \brief		Getter for the size of the filling window.
+	 * \return		The size of the filling window.
+	 */
+	unsigned getFillingWindowSize() const;
+
     /**
      * \brief		Getter for Help_ bool.
      * \return		Help_;
@@ -173,6 +206,21 @@ private:
      * \brief		Boolean to defines if radar mode or plain grey level.
      */
     bool RadarMode_;
+
+	/**
+	 * \brief		Boolean to defines if we should do a computation by parts.
+	 */
+	bool NonOptimalMode_;
+
+	/**
+	 * \brief		Size of the compute window.
+	 */
+	unsigned ComputeWindowSize_;
+
+	/**
+	 * \brief		Size of the filling window.
+	 */
+	unsigned FillingWindowSize_;
 
     /**
      * \brief		Boolean to defines if help was called.
