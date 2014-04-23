@@ -24,6 +24,9 @@ ComputeByParts<Minimizer>::compute(const cv::Mat& input)
     OutputS_ = cv::Mat(input.size(), input.type());
     OutputC_ = cv::Mat(input.size(), input.type());
 
+	double iternum = 0;
+	double itermax = (input.size().height / fillSize_) * (input.size().width / fillSize_);
+
     for (unsigned i = 0; i < input.size().height - fillSize_;
 		 i += fillSize_)
     {
@@ -58,14 +61,25 @@ ComputeByParts<Minimizer>::compute(const cv::Mat& input)
 			cv::Rect FillRegion(startJFill, startIFill, endJFill - startJFill,
 								endIFill - startIFill);
 
+			std::clog << iternum++ / itermax * 100 << "%" << std::endl;
+
 			if (minimizer_.compute(inputCropped))
 			{
 				for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
 					for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
 					{
-						OutputBV_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputBV().template at<unsigned short>(tmp_i - i, tmp_j - j);
-						OutputS_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputS().template at<unsigned short>(tmp_i - i, tmp_j - j);
-						OutputC_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputComplete().template at<unsigned short>(tmp_i - i, tmp_j - j);
+						if (input.type() == CV_8U)
+						{
+							OutputBV_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputBV().template at<unsigned char>(tmp_i - i, tmp_j - j);
+							OutputS_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputS().template at<unsigned char>(tmp_i - i, tmp_j - j);
+							OutputC_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputComplete().template at<unsigned char>(tmp_i - i, tmp_j - j);
+						}
+						else
+						{
+							OutputBV_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputBV().template at<unsigned short>(tmp_i - i, tmp_j - j);
+							OutputS_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputS().template at<unsigned short>(tmp_i - i, tmp_j - j);
+							OutputC_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputComplete().template at<unsigned short>(tmp_i - i, tmp_j - j);
+						}
 					}
 			}
 			else
