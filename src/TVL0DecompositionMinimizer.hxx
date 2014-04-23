@@ -39,8 +39,6 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     unsigned nbAlpha = Alpha_.size();
     unsigned nbNodes = nbPix * nbAlpha;
 
-    std::clog << "Graph construction:" << std::flush;
-
     //Allocation of the memory for the graph.
     Graph* g = new Graph(nbNodes, 2 * nbNodes);
     Graph::node_id* nodes = new Graph::node_id[nbNodes];
@@ -119,12 +117,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     	}
     }
 
-    std::clog << " done." << std::endl;
-    std::clog << "Max flow computation:" << std::flush;
     //Computation of max flow.
-    double MaxFlowValue = g->maxflow();
-    std::clog << " done." << std::endl
-			  << "Value = " << MaxFlowValue << std::endl;
+    g->maxflow();
 
     OutputBV_ = cv::Mat(Height, Width, input.type());
     OutputS_ = cv::Mat(Height, Width, input.type());

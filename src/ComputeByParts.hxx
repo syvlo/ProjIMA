@@ -61,7 +61,7 @@ ComputeByParts<Minimizer>::compute(const cv::Mat& input)
 			cv::Rect FillRegion(startJFill, startIFill, endJFill - startJFill,
 								endIFill - startIFill);
 
-			std::clog << iternum++ / itermax * 100 << "%" << std::endl;
+			std::clog << "\r" << iternum++ / itermax * 100 << "%" << std::flush;
 
 			if (minimizer_.compute(inputCropped))
 			{
