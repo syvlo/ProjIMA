@@ -65,20 +65,23 @@ ComputeByParts<Minimizer>::compute(const cv::Mat& input)
 
 			if (minimizer_.compute(inputCropped))
 			{
+				cv::Mat OBV = minimizer_.getOutputBV();
+				cv::Mat OS = minimizer_.getOutputS();
+				cv::Mat OC = minimizer_.getOutputComplete();
 				for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
 					for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
 					{
 						if (input.type() == CV_8U)
 						{
-							OutputBV_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputBV().template at<unsigned char>(tmp_i - i, tmp_j - j);
-							OutputS_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputS().template at<unsigned char>(tmp_i - i, tmp_j - j);
-							OutputC_.at<unsigned char>(tmp_i, tmp_j) = minimizer_.getOutputComplete().template at<unsigned char>(tmp_i - i, tmp_j - j);
+							OutputBV_.at<unsigned char>(tmp_i, tmp_j) = OBV.at<unsigned char>(tmp_i - i, tmp_j - j);
+							OutputS_.at<unsigned char>(tmp_i, tmp_j) = OS.at<unsigned char>(tmp_i - i, tmp_j - j);
+							OutputC_.at<unsigned char>(tmp_i, tmp_j) = OC.at<unsigned char>(tmp_i - i, tmp_j - j);
 						}
 						else
 						{
-							OutputBV_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputBV().template at<unsigned short>(tmp_i - i, tmp_j - j);
-							OutputS_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputS().template at<unsigned short>(tmp_i - i, tmp_j - j);
-							OutputC_.at<unsigned short>(tmp_i, tmp_j) = minimizer_.getOutputComplete().template at<unsigned short>(tmp_i - i, tmp_j - j);
+							OutputBV_.at<unsigned short>(tmp_i, tmp_j) = OBV.at<unsigned short>(tmp_i - i, tmp_j - j);
+							OutputS_.at<unsigned short>(tmp_i, tmp_j) = OS.at<unsigned short>(tmp_i - i, tmp_j - j);
+							OutputC_.at<unsigned short>(tmp_i, tmp_j) = OutputBV_.at<unsigned short>(tmp_i, tmp_j) + OutputS_.at<unsigned short>(tmp_i, tmp_j);
 						}
 					}
 			}

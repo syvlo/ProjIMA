@@ -132,9 +132,21 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
     	{
     	    unsigned current = offset + j;
 			if (input.type() == CV_8U)
+			{
 				OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
+				OutputS_.at<unsigned char>(i, j) =
+							DataTerm::ComputeUs(input.at<unsigned char>(i, j),
+												Alpha_[0], Gamma_, BetaS_, BetaBV_);
+				OutputComplete_.at<unsigned char>(i, j) =
+							OutputBV_.at<unsigned char>(i, j)
+							+ OutputS_.at<unsigned char>(i, j);
+			}
 			else
+			{
 				OutputBV_.at<unsigned short>(i, j) = Alpha_[0];
+				OutputS_.at<unsigned short>(i, j) = DataTerm::ComputeUs(input.at<unsigned short>(i, j), Alpha_[0], Gamma_, BetaS_, BetaBV_);
+				OutputComplete_.at<unsigned short>(i, j) = OutputBV_.at<unsigned short>(i, j) +  OutputS_.at<unsigned short>(i, j);
+			}
 
     	    for (unsigned level = nbAlpha - 1; level >= 1; --level)
     	    {
