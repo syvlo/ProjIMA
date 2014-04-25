@@ -18,72 +18,87 @@ ComputeByParts<Minimizer>::~ComputeByParts()
 
 template <typename Minimizer>
 bool
-ComputeByParts<Minimizer>::compute(const cv::Mat& input)
+ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 {
-    OutputBV_ = cv::Mat(input.size(), input.type());
-    OutputS_ = cv::Mat(input.size(), input.type());
-    OutputC_ = cv::Mat(input.size(), input.type());
+	if (inputs.size() == 0)
+		return false;
+
+	for (unsigned i = 0; i < inputs.size(); ++i)
+	{
+		OutputsBV_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
+		OutputsS_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
+		OutputsC_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
+	}
 
 	double iternum = 0;
-	double itermax = (input.size().height / fillSize_) * (input.size().width / fillSize_);
+	double itermax = (inputs[0].size().height / fillSize_) * (inputs[0].size().width / fillSize_);
 
-    for (unsigned i = 0; i < input.size().height - fillSize_;
+    for (unsigned i = 0; i < inputs[0].size().height - fillSize_;
 		 i += fillSize_)
     {
-		for (unsigned j = 0; j < input.size().width - fillSize_;
+		for (unsigned j = 0; j < inputs[0].size().width - fillSize_;
 			 j += fillSize_)
 		{
 			int endi = i + computeSize_;
-			if (endi >= input.size().height)
-				endi = input.size().height - 1;
+			if (endi >= inputs[0].size().height)
+				endi = inputs[0].size().height - 1;
 			int endj = j + computeSize_;
-			if (endj >= input.size().width)
-				endj = input.size().width - 1;
+			if (endj >= inputs[0].size().width)
+				endj = inputs[0].size().width - 1;
 
 			cv::Rect ComputeRegion(j, i, endj - j, endi - i);
-			cv::Mat inputCropped = input(ComputeRegion);
+			std::vector<cv::Mat> inputsCropped;
+			for (unsigned i_img = 0; i_img < inputs.size(); ++i_img)
+			{
+				inputsCropped.push_back(inputs[i_img](ComputeRegion));
+			}
 
 
 			int startIFill = i + (computeSize_ - fillSize_) / 2;
 			if (i == 0)
 				startIFill = 0;
 			int endIFill = i + (computeSize_ + fillSize_) / 2;
-			if (endi == input.size().height - 1)
-				endIFill = input.size().height - 1;
+			if (endi == inputs[0].size().height - 1)
+				endIFill = inputs[0].size().height - 1;
 
 			int startJFill = j + (computeSize_ - fillSize_) / 2;
 			if (j == 0)
 				startJFill = 0;
 			int endJFill = j + (computeSize_ + fillSize_) / 2;
-			if (endj == input.size().width - 1)
-				endJFill = input.size().width - 1;
+			if (endj == inputs[0].size().width - 1)
+				endJFill = inputs[0].size().width - 1;
 
 			cv::Rect FillRegion(startJFill, startIFill, endJFill - startJFill,
 								endIFill - startIFill);
 
 			std::clog << "\r" << iternum++ / itermax * 100 << "%" << std::flush;
 
-			if (minimizer_.compute(inputCropped))
+			if (minimizer_.compute(inputsCropped))
 			{
-				cv::Mat OBV = minimizer_.getOutputBV();
-				cv::Mat OS = minimizer_.getOutputS();
-				cv::Mat OC = minimizer_.getOutputComplete();
-				for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
-					for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
+				std::vector<cv::Mat> OBV = minimizer_.getOutputsBV();
+				std::vector<cv::Mat> OS = minimizer_.getOutputsS();
+				std::vector<cv::Mat> OC = minimizer_.getOutputsComplete();
+				for (unsigned img_i = 0; img_i < inputs.size(); ++img_i)
+				{
+					for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
 					{
-						if (input.type() == CV_8U)
+						for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
 						{
-							OutputBV_.at<unsigned char>(tmp_i, tmp_j) = OBV.at<unsigned char>(tmp_i - i, tmp_j - j);
-							OutputS_.at<unsigned char>(tmp_i, tmp_j) = OS.at<unsigned char>(tmp_i - i, tmp_j - j);
-							OutputC_.at<unsigned char>(tmp_i, tmp_j) = OC.at<unsigned char>(tmp_i - i, tmp_j - j);
-						}
-						else
-						{
-							OutputBV_.at<unsigned short>(tmp_i, tmp_j) = OBV.at<unsigned short>(tmp_i - i, tmp_j - j);
-							OutputS_.at<unsigned short>(tmp_i, tmp_j) = OS.at<unsigned short>(tmp_i - i, tmp_j - j);
-							OutputC_.at<unsigned short>(tmp_i, tmp_j) = OutputBV_.at<unsigned short>(tmp_i, tmp_j) + OutputS_.at<unsigned short>(tmp_i, tmp_j);
+							if (inputs[0].type() == CV_8U)
+							{
+								OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) = OBV[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+								OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) = OS[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+								OutputsC_[img_i].at<unsigned char>(tmp_i, tmp_j) = OC[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+							}
+							else
+							{
+								OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) = OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
+								OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j) = OS[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
+								OutputsC_[img_i].at<unsigned short>(tmp_i, tmp_j) = OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) + OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j);
+							}
 						}
 					}
+				}
 			}
 			else
 			{
@@ -97,23 +112,23 @@ ComputeByParts<Minimizer>::compute(const cv::Mat& input)
 }
 
 template <typename Minimizer>
-const cv::Mat&
-ComputeByParts<Minimizer>::getOutputBV() const
+const std::vector<cv::Mat>
+ComputeByParts<Minimizer>::getOutputsBV() const
 {
-    return OutputBV_;
+    return OutputsBV_;
 }
 
 template <typename Minimizer>
-const cv::Mat&
-ComputeByParts<Minimizer>::getOutputS() const
+const std::vector<cv::Mat>
+ComputeByParts<Minimizer>::getOutputsS() const
 {
-    return OutputS_;
+    return OutputsS_;
 }
 template <typename Minimizer>
-const cv::Mat&
-ComputeByParts<Minimizer>::getOutputC() const
+const std::vector<cv::Mat>
+ComputeByParts<Minimizer>::getOutputsC() const
 {
-    return OutputC_;
+    return OutputsC_;
 }
 
 #endif /* !COMPUTE_BY_PARTS_HXX_ */

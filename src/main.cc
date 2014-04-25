@@ -71,52 +71,78 @@ int main (int argc, char* argv[])
     }
     else
     {
-		cv::Mat input;
-		if (!args.getRadarMode())
-			input = cv::imread(args.getInputImage(), CV_LOAD_IMAGE_GRAYSCALE);
-		else
-			input = ReadImw(args.getInputImage());
+		std::vector<cv::Mat> inputs;
+		const std::vector<char*> inputsNames = args.getInputImages();;
 
-		cv::Mat OutputBV;
-		cv::Mat OutputS;
-		cv::Mat OutputC;
+		for (std::vector<char*>::const_iterator it = inputsNames.begin();
+			 it != inputsNames.end(); ++it)
+		{
+			if (!args.getRadarMode())
+				inputs.push_back(cv::imread(*it, CV_LOAD_IMAGE_GRAYSCALE));
+			else
+				inputs.push_back(ReadImw(*it));
+		}
+
+		std::vector<cv::Mat> OutputsBV;
+		std::vector<cv::Mat> OutputsS;
+		std::vector<cv::Mat> OutputsC;
 
 		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
 		if (args.getNonOptimalMode())
 		{
 			ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
-			computer.compute(input);
+			computer.compute(inputs);
 
-			OutputBV = computer.getOutputBV();
-			OutputS = computer.getOutputS();
-			OutputC = computer.getOutputC();
+			OutputsBV = computer.getOutputsBV();
+			OutputsS = computer.getOutputsS();
+			OutputsC = computer.getOutputsC();
 		}
 		else
 		{
-			minimizer.compute(input);
+			minimizer.compute(inputs);
 
-			OutputBV = minimizer.getOutputBV();
-			OutputS = minimizer.getOutputS();
-			OutputC = minimizer.getOutputComplete();
+			OutputsBV = minimizer.getOutputsBV();
+			OutputsS = minimizer.getOutputsS();
+			OutputsC = minimizer.getOutputsComplete();
 		}
 
-		if (!args.getRadarMode())
-		    cv::imwrite(args.getOutputImageBV(), OutputBV);
-		else
-		    WriteImw(OutputBV, args.getOutputImageBV());
-		if (!args.getRadarMode())
-		    cv::imwrite(args.getOutputImageS(), OutputS);
-		else
-		    WriteImw(OutputS, args.getOutputImageS());
-		if (args.getOutputImageComplete())
+		for (unsigned i = 0; i < OutputsBV.size(); ++i)
 		{
-		    if (!args.getRadarMode())
-			cv::imwrite(args.getOutputImageComplete(), OutputC);
-		    else
-				WriteImw(OutputC, args.getOutputImageComplete());
-		}
+			std::string OBVName(args.getOutputImageBV());
+			if (OutputsBV.size() > 1)
+				OBVName.append(std::to_string(i));
 
+			std::string OSName(args.getOutputImageS());
+			if (OutputsS.size() > 1)
+				OSName.append(std::to_string(i));
+
+			std::string OCName(args.getOutputImageComplete());
+			if (OutputsC.size() > 1)
+				OCName.append(std::to_string(i));
+
+
+			std::clog << "Writing BV image to " << OBVName << std::endl;
+			if (!args.getRadarMode())
+				cv::imwrite(OBVName, OutputsBV[i]);
+			else
+				WriteImw(OutputsBV[i], OBVName.c_str());
+
+			std::clog << "Writing S image to " << OSName << std::endl;
+			if (!args.getRadarMode())
+				cv::imwrite(OSName, OutputsS[i]);
+			else
+				WriteImw(OutputsS[i], OSName.c_str());
+
+			if (args.getOutputImageComplete())
+			{
+				std::clog << "Writing C image to " << OCName << std::endl;
+				if (!args.getRadarMode())
+					cv::imwrite(OCName, OutputsC[i]);
+				else
+					WriteImw(OutputsC[i], OCName.c_str());
+			}
+		}
 
     }
 

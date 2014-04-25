@@ -30,154 +30,186 @@ TVL0DecompositionMinimizer<DataTerm>::~TVL0DecompositionMinimizer()
 
 template <typename DataTerm>
 bool
-TVL0DecompositionMinimizer<DataTerm>::compute(const cv::Mat& input)
+TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 {
+
     //Useful information about the image.
-    unsigned Height = input.size().height;
-    unsigned Width = input.size().width;
+	unsigned nbImages = inputs.size();
+
+	//Check if at least one image is given as input.
+	if (nbImages == 0)
+		return false;
+
+    unsigned Height = inputs[0].size().height;
+    unsigned Width = inputs[0].size().width;
     unsigned nbPix = Width * Height;
     unsigned nbAlpha = Alpha_.size();
     unsigned nbNodes = nbPix * nbAlpha;
+	unsigned type = inputs[0].type();
 
     //Allocation of the memory for the graph.
-    Graph* g = new Graph(nbNodes, 2 * nbNodes);
-    Graph::node_id* nodes = new Graph::node_id[nbNodes];
+    Graph* g = new Graph(nbNodes * nbImages, 2 * nbNodes * nbImages);
+    Graph::node_id* nodes = new Graph::node_id[nbNodes * nbImages];
 
     //Creation of the nodes.
-    for (unsigned i = 0; i < nbNodes; ++i)
-		nodes[i] = g->add_node();
+	for (unsigned i_img = 0; i_img < nbImages; ++ i_img)
+		for (unsigned i = 0; i < nbNodes; ++i)
+			nodes[i_img * nbNodes + i] = g->add_node();
 
     //Links definition
-    for (unsigned i = 0; i < Height; ++i)
-    {
-    	unsigned offset = i * Width;
-    	for (unsigned j = 0; j < Width; ++j)
-    	{
-    	    /*For each site, we have one node for each possible value it can
-    	      have.*/
-    	    unsigned current = offset + j;
-
-    	    ///////////////////////////////////
-            // Links defintion for data term //
-            ///////////////////////////////////
-
-    	    //Smallest alpha is linked to the sink with infinite weight.
-    	    g->add_tweights(nodes[current], 0, INFTY);
-
-    	    //Every level (except last one) is linked to the one above it.
-    	    for (unsigned level = 1; level < nbAlpha; ++level)
+	for (unsigned i_img = 0; i_img < nbImages; ++ i_img)
+	{
+		unsigned offset_img = i_img * nbNodes;
+		for (unsigned i = 0; i < Height; ++i)
+		{
+			unsigned offset = i * Width;
+			for (unsigned j = 0; j < Width; ++j)
 			{
-				if (input.type() == CV_8U)
-					g->add_edge(nodes[current + (level - 1) * nbPix],
-								nodes[current + level * nbPix],
-								INFTY,
-								DataTerm::Compute(input.at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+				/*For each site, we have one node for each possible value it can
+				  have.*/
+				unsigned current = offset_img + offset + j;
+
+				///////////////////////////////////
+				// Links defintion for data term //
+				///////////////////////////////////
+
+				//Smallest alpha is linked to the sink with infinite weight.
+				g->add_tweights(nodes[current], 0, INFTY);
+
+				//Every level (except last one) is linked to the one above it.
+				for (unsigned level = 1; level < nbAlpha; ++level)
+				{
+					if (type == CV_8U)
+						g->add_edge(nodes[current + (level - 1) * nbPix],
+									nodes[current + level * nbPix],
+									INFTY,
+									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+					else
+						g->add_edge(nodes[current + (level - 1) * nbPix],
+									nodes[current + level * nbPix],
+									INFTY,
+									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+				}
+
+				//Last one is linked to the source
+				if (type == CV_8U)
+					g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j),
+													  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
 				else
-					g->add_edge(nodes[current + (level - 1) * nbPix],
-								nodes[current + level * nbPix],
-								INFTY,
-								DataTerm::Compute(input.at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+					g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
+									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j),
+													  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
+
+				//////////////////////////////////////////////
+				// Links definition for regularization term //
+				//////////////////////////////////////////////
+				double beta = BetaBV_;
+				//Eastern neighbour
+				if (j < Width - 1)
+					for (unsigned level = 1; level <= nbAlpha; ++level)
+					{
+						g->add_edge(nodes[current + (level - 1) * nbPix],
+									nodes[current + (level - 1) * nbPix + 1],
+									beta,
+									beta);
+					}
+
+				//Southern neighbour
+				if (i < Height - 1)
+					for (unsigned level = 1; level <= nbAlpha; ++level)
+					{
+						g->add_edge(nodes[current + (level - 1) * nbPix],
+									//Ou + Height comme dans TP ?
+									nodes[current + (level - 1) * nbPix + Width],
+									beta,
+									beta);
+					}
+
+				//Backward (previous image) neighbour.
+				if (i_img > 0)
+					for (unsigned level = 1; level <= nbAlpha; ++level)
+					{
+						g->add_edge(nodes[current + (level -1) * nbPix],
+									//Ou + Height comme dans TP ?
+									nodes[current + (level - 1) * nbPix  - offset_img],
+									beta,
+									beta);
+					}
 			}
-
-    	    //Last one is linked to the source
-			if (input.type() == CV_8U)
-				g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-								DataTerm::Compute(input.at<unsigned char>(i, j),
-												  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
-			else
-				g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
-								DataTerm::Compute(input.at<unsigned short>(i, j),
-												  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
-
-    	    //////////////////////////////////////////////
-            // Links definition for regularization term //
-            //////////////////////////////////////////////
-    	    //Eastern neighbour
-    	    if (j < Width - 1)
-				for (unsigned level = 1; level <= nbAlpha; ++level)
-				{
-					double beta = BetaBV_;
-					g->add_edge(nodes[current + (level - 1) * nbPix],
-								nodes[current + (level - 1) * nbPix + 1],
-								beta,
-								beta);
-				}
-
-    	    //Southern neighbour
-    	    if (i < Height - 1)
-				for (unsigned level = 1; level <= nbAlpha; ++level)
-				{
-					double beta = BetaBV_;
-					g->add_edge(nodes[current + (level - 1) * nbPix],
-								//Ou + Height comme dans TP ?
-								nodes[current + (level - 1) * nbPix + Width],
-								beta,
-								beta);
-				}
-    	}
-    }
+		}
+	}
 
     //Computation of max flow.
     g->maxflow();
 
-    OutputBV_ = cv::Mat(Height, Width, input.type());
-    OutputS_ = cv::Mat(Height, Width, input.type());
-    OutputComplete_ = cv::Mat(Height, Width, input.type());
+    //Construction of the output images.
+	for (unsigned i_img = 0; i_img < nbImages; ++ i_img)
+	{
+		OutputsBV_.push_back(cv::Mat(Height, Width, type));
+		OutputsS_.push_back(cv::Mat(Height, Width, type));
+		OutputsComplete_.push_back(cv::Mat(Height, Width, type));
 
-    //Construction of the ouput image.
-    for (unsigned i = 0; i < Height; ++i)
-    {
-    	unsigned offset = i * Width;
-    	for (unsigned j = 0; j < Width; ++j)
-    	{
-    	    unsigned current = offset + j;
-			if (input.type() == CV_8U)
-			{
-				OutputBV_.at<unsigned char>(i, j) = Alpha_[0];
-				OutputS_.at<unsigned char>(i, j) =
-							DataTerm::ComputeUs(input.at<unsigned char>(i, j),
-												Alpha_[0], Gamma_, BetaS_, BetaBV_);
-				OutputComplete_.at<unsigned char>(i, j) =
-							OutputBV_.at<unsigned char>(i, j)
-							+ OutputS_.at<unsigned char>(i, j);
-			}
-			else
-			{
-				OutputBV_.at<unsigned short>(i, j) = Alpha_[0];
-				OutputS_.at<unsigned short>(i, j) = DataTerm::ComputeUs(input.at<unsigned short>(i, j), Alpha_[0], Gamma_, BetaS_, BetaBV_);
-				OutputComplete_.at<unsigned short>(i, j) = OutputBV_.at<unsigned short>(i, j) +  OutputS_.at<unsigned short>(i, j);
-			}
+		unsigned offset_img = i_img * nbNodes;
 
-    	    for (unsigned level = nbAlpha - 1; level >= 1; --level)
-    	    {
-				if (g->what_segment(nodes[current + (level) * nbPix])
-					!= Graph::SOURCE)
+		for (unsigned i = 0; i < Height; ++i)
+		{
+			unsigned offset = i * Width;
+			for (unsigned j = 0; j < Width; ++j)
+			{
+				unsigned current = offset_img + offset + j;
+				if (type == CV_8U)
 				{
-					if (input.type() == CV_8U)
-					{
-						OutputBV_.at<unsigned char>(i, j) = Alpha_[level];
-						OutputS_.at<unsigned char>(i, j) =
-							DataTerm::ComputeUs(input.at<unsigned char>(i, j),
-												Alpha_[level], Gamma_, BetaS_, BetaBV_);
-						OutputComplete_.at<unsigned char>(i, j) =
-							OutputBV_.at<unsigned char>(i, j)
-							+ OutputS_.at<unsigned char>(i, j);
-					}
-					else
-					{
-						OutputBV_.at<unsigned short>(i, j) = Alpha_[level];
-						OutputS_.at<unsigned short>(i, j) =
-							DataTerm::ComputeUs(input.at<unsigned short>(i, j),
-												Alpha_[level], Gamma_, BetaS_, BetaBV_);
-						OutputComplete_.at<unsigned short>(i, j) =
-							OutputBV_.at<unsigned short>(i, j)
-							+ OutputS_.at<unsigned short>(i, j);
-					}
-					break;
+					OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[0];
+					OutputsS_[i_img].at<unsigned char>(i, j) =
+						DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
+											Alpha_[0], Gamma_, BetaS_, BetaBV_);
+					OutputsComplete_[i_img].at<unsigned char>(i, j) =
+						OutputsBV_[i_img].at<unsigned char>(i, j)
+						+ OutputsS_[i_img].at<unsigned char>(i, j);
 				}
-    	    }
-    	}
-    }
+				else
+				{
+					OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[0];
+					OutputsS_[i_img].at<unsigned short>(i, j) =
+						DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
+											Alpha_[0], Gamma_, BetaS_, BetaBV_);
+					OutputsComplete_[i_img].at<unsigned short>(i, j) =
+						OutputsBV_[i_img].at<unsigned short>(i, j)
+						+ OutputsS_[i_img].at<unsigned short>(i, j);
+				}
+
+				for (unsigned level = nbAlpha - 1; level >= 1; --level)
+				{
+					if (g->what_segment(nodes[current + (level) * nbPix])
+						!= Graph::SOURCE)
+					{
+						if (type == CV_8U)
+						{
+							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level];
+							OutputsS_[i_img].at<unsigned char>(i, j) =
+								DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
+													Alpha_[level], Gamma_, BetaS_, BetaBV_);
+							OutputsComplete_[i_img].at<unsigned char>(i, j) =
+								OutputsBV_[i_img].at<unsigned char>(i, j)
+								+ OutputsS_[i_img].at<unsigned char>(i, j);
+						}
+						else
+						{
+							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level];
+							OutputsS_[i_img].at<unsigned short>(i, j) =
+								DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
+													Alpha_[level], Gamma_, BetaS_, BetaBV_);
+							OutputsComplete_[i_img].at<unsigned short>(i, j) =
+								OutputsBV_[i_img].at<unsigned short>(i, j)
+								+ OutputsS_[i_img].at<unsigned short>(i, j);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
 
     delete g;
     delete[] nodes;
@@ -200,24 +232,24 @@ TVL0DecompositionMinimizer<DataTerm>::setBetaS(const double BetaS)
 }
 
 template <typename DataTerm>
-const cv::Mat&
-TVL0DecompositionMinimizer<DataTerm>::getOutputBV() const
+const std::vector<cv::Mat>
+TVL0DecompositionMinimizer<DataTerm>::getOutputsBV() const
 {
-    return OutputBV_;
+    return OutputsBV_;
 }
 
 template <typename DataTerm>
-const cv::Mat&
-TVL0DecompositionMinimizer<DataTerm>::getOutputS() const
+const std::vector<cv::Mat>
+TVL0DecompositionMinimizer<DataTerm>::getOutputsS() const
 {
-    return OutputS_;
+    return OutputsS_;
 }
 
 template <typename DataTerm>
-const cv::Mat&
-TVL0DecompositionMinimizer<DataTerm>::getOutputComplete() const
+const std::vector<cv::Mat>
+TVL0DecompositionMinimizer<DataTerm>::getOutputsComplete() const
 {
-    return OutputComplete_;
+    return OutputsComplete_;
 }
 
 

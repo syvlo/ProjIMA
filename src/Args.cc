@@ -5,7 +5,7 @@
 Args::Args (int argc, char* argv[])
 {
     //Default Values
-    InputImage_ = NULL;
+    //InputImages_ = NULL;
     OutputImageBV_ = NULL;
     OutputImageS_ = NULL;
     OutputImageComplete_ = NULL;
@@ -26,8 +26,8 @@ Args::Args (int argc, char* argv[])
 	    BetaS_ = atof(argv[++i]);
 	else if (!strcmp("-i", argv[i]) || !strcmp("--InputImage", argv[i]))
 	{
-	    InputImage_ = new char[strlen(argv[++i]) + 1];
-	    std::strcpy(InputImage_, argv[i]);
+	    InputImages_.push_back(new char[strlen(argv[++i]) + 1]);
+	    std::strcpy(InputImages_[InputImages_.size() - 1], argv[i]);
 	}
 	else if (!strcmp("-oBV", argv[i]) || !strcmp("--OutputImageBV", argv[i]))
 	{
@@ -66,8 +66,10 @@ Args::Args (int argc, char* argv[])
 
 Args::~Args()
 {
-    if (InputImage_)
-	delete[] InputImage_;
+	for (std::vector<char*>::iterator it = InputImages_.begin();
+		 it != InputImages_.end(); ++it)
+		delete (*it);
+
     if (OutputImageBV_)
 	delete[] OutputImageBV_;
     if (OutputImageS_)
@@ -79,8 +81,8 @@ Args::~Args()
 bool
 Args::checkConsistency() const
 {
-    if (!WindowMode_ && (!InputImage_ || !OutputImageBV_ || !OutputImageS_))
-	return false;
+    if (!WindowMode_ && (InputImages_.empty() || !OutputImageBV_ || !OutputImageS_))
+		return false;
     return true;
 }
 
@@ -90,7 +92,7 @@ Args::printHelp() const
     std::cout << "Available parameters:" << std::endl
 			  << "* -BBV/--BetaBV <value>, BetaBV;" << std::endl
 			  << "* -BS/--BetaS <value>, BetaS;" << std::endl
-			  << "* -i/--InputImage <value>, image to be denoised;" << std::endl
+			  << "* -i/--InputImage <value>, image to be denoised. You can add several images by repeating argument." << std::endl
 			  << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
 			  << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
 			  << "* -oC/--OutputImageComplete <value>, image to store the denoised image;" << std::endl
@@ -120,10 +122,10 @@ Args::getBetaBV() const
     return BetaBV_;
 }
 
-const char*
-Args::getInputImage() const
+const std::vector<char*>
+Args::getInputImages() const
 {
-    return InputImage_;
+    return InputImages_;
 }
 
 const char*
@@ -180,8 +182,14 @@ operator<< (std::ostream& stream, const Args& args)
 {
     stream << "BetaBV = " << args.BetaBV_ << "," << std::endl
 	   << "BetaS = " << args.BetaS_ << "," << std::endl;
-    if (args.InputImage_)
-	stream << "InputImage = " << args.InputImage_ << "," << std::endl;
+
+	unsigned i = 0;
+	for (std::vector<char*>::const_iterator it = args.InputImages_.begin();
+		 it != args.InputImages_.end(); ++it)
+	{
+		stream << "InputImage #" << i++ << " = " << *it << "," << std::endl;
+	}
+
     if (args.OutputImageBV_)
 	stream << "OutputImageBV = " << args.OutputImageBV_ << "," << std::endl;
     if (args.OutputImageS_)
@@ -201,5 +209,3 @@ operator<< (std::ostream& stream, const Args& args)
 
     return stream;
 }
-
-

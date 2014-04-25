@@ -46,9 +46,10 @@ public:
     /**
      * \brief		Method that construct the graph, launch the mincut and
      *			output the images.
-     * \param		input	The image to be denoised.
+     * \param		inputs	The images to be denoised (could be just one image
+	 *					in the vector).
      */
-    bool compute(const cv::Mat& input);
+    bool compute(const std::vector<cv::Mat> inputs);
 
     /**
      * \brief		Setter for BetaBV.
@@ -63,22 +64,22 @@ public:
     void setBetaS(const double BetaS);
 
     /**
-     * \brief		Getter for the Bounded variations image.
-     * \return		The image.
+     * \brief		Getter for the Bounded variations images.
+     * \return		The images.
      */
-    const cv::Mat& getOutputBV() const;
+    const std::vector<cv::Mat> getOutputsBV() const;
 
     /**
-     * \brief		Getter for the Scatterers image.
-     * \return		The image.
+     * \brief		Getter for the Scatterers images.
+     * \return		The images.
      */
-    const cv::Mat& getOutputS() const;
+    const std::vector<cv::Mat> getOutputsS() const;
 
     /**
-     * \brief		Getter for the complete image.
-     * \return		The image.
+     * \brief		Getter for the complete images.
+     * \return		The images.
      */
-    const cv::Mat& getOutputComplete() const;
+    const std::vector<cv::Mat> getOutputsComplete() const;
 
 private:
     /**
@@ -102,19 +103,19 @@ private:
     const std::vector<unsigned> Gamma_;
 
     /**
-     * Stores the last bounded variations image computed
+     * Stores the last bounded variations images computed
      */
-    cv::Mat OutputBV_;
+	std::vector<cv::Mat> OutputsBV_;
 
     /**
-     * Stores the last scatterers image computed.
+     * Stores the last scatterers images computed.
      */
-    cv::Mat OutputS_;
+	std::vector<cv::Mat> OutputsS_;
 
     /**
-     * Stores the last complete image computed.
+     * Stores the last complete images computed.
      */
-    cv::Mat OutputComplete_;
+	std::vector<cv::Mat> OutputsComplete_;
 
     //Look-up tables must be provided.
     TVL0DecompositionMinimizer();

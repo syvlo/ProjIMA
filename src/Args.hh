@@ -9,6 +9,7 @@
  */
 
 # include <iostream>
+# include <vector>
 
 /**
  * Default value for BetaBV.
@@ -94,10 +95,10 @@ public:
     double getBetaBV() const;
 
     /**
-     * \brief		Getter for input image name.
-     * \return		InputImage
+     * \brief		Getter for input images names.
+     * \return		InputImages
      */
-    const char* getInputImage() const;
+    const std::vector<char*> getInputImages() const;
 
     /**
      * \brief		Getter for BV output image.
@@ -175,9 +176,9 @@ private:
     double BetaBV_;
 
     /**
-     * \brief		Path to the image to be denoised.
+     * \brief		Path to the images to be denoised.
      */
-    char* InputImage_;
+	std::vector<char*> InputImages_;
 
     /**
      * \brief		Path to image where the bounded variations image

@@ -10,7 +10,7 @@
  */
 
 # include <cv.h>
-
+# include <vector>
 /**
  * Default value for the window size used for computation.
  */
@@ -47,28 +47,28 @@ public:
 	/**
 	 * \brief Method that split the image in blocks and find the optimum
 	 *			on each one of them.
-	 * \param	input	The input image.
+	 * \param	inputs	The input images.
 	 * \return	true if everything went OK, false otherwise.
 	 */
-    bool compute(const cv::Mat& input);
+    bool compute(const std::vector<cv::Mat> inputs);
 
 	/**
-	 * \brief Return the Bounded variations image.
-	 * \return	The image.
+	 * \brief Return the Bounded variations images.
+	 * \return	The images.
 	 */
-    const cv::Mat& getOutputBV() const;
+    const std::vector<cv::Mat> getOutputsBV() const;
 
 	/**
-	 * \brief Return the scaterers image.
-	 * \return	The image.
+	 * \brief Return the scaterers images.
+	 * \return	The images.
 	 */
-    const cv::Mat& getOutputS() const;
+    const std::vector<cv::Mat> getOutputsS() const;
 
 	/**
-	 * \brief Return the complete image.
-	 * \return	The image.
+	 * \brief Return the complete images.
+	 * \return	The images.
 	 */
-    const cv::Mat& getOutputC() const;
+    const std::vector<cv::Mat> getOutputsC() const;
 
 
 private:
@@ -88,19 +88,19 @@ private:
     Minimizer& minimizer_;
 
 	/**
-	 * Bounded variations image
+	 * Bounded variations images.
 	 */
-    cv::Mat OutputBV_;
+	std::vector<cv::Mat> OutputsBV_;
 
     /**
-	 * Scaterers image.
+	 * Scaterers images.
 	 */
-    cv::Mat OutputS_;
+	std::vector<cv::Mat> OutputsS_;
 
 	/**
-	 * Complete image.
+	 * Complete images.
 	 */
-    cv::Mat OutputC_;
+	std::vector<cv::Mat> OutputsC_;
 
 	//Shoudl not use default constructor.
     ComputeByParts();
