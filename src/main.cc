@@ -118,8 +118,11 @@ int main (int argc, char* argv[])
 				OSName.append(std::to_string(i));
 
 			std::string OCName(args.getOutputImageComplete());
-			if (OutputsC.size() > 1)
-				OCName.append(std::to_string(i));
+			if (args.getOutputImageComplete())
+			{
+				if (OutputsC.size() > 1)
+					OCName.append(std::to_string(i));
+			}
 
 
 			std::clog << "Writing BV image to " << OBVName << std::endl;
