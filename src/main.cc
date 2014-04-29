@@ -87,11 +87,14 @@ int main (int argc, char* argv[])
 		std::vector<cv::Mat> OutputsS;
 		std::vector<cv::Mat> OutputsC;
 
-		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+
+		RiceDataTerm<unsigned, unsigned>::init();
+
+		TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
 		if (args.getNonOptimalMode())
 		{
-			ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
+			ComputeByParts<TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > > computer(100, 50, minimizer);
 			computer.compute(inputs);
 
 			OutputsBV = computer.getOutputsBV();
@@ -146,8 +149,10 @@ int main (int argc, char* argv[])
 					WriteImw(OutputsC[i], OCName.c_str());
 			}
 		}
-
+		RiceDataTerm<unsigned, unsigned>::destroy();
     }
+
+
 
     return (0);
 }

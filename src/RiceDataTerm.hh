@@ -32,7 +32,19 @@ public:
     static Output ComputeUs(const Input& V, const Input& Ubv, const std::vector<Input>& gamma, const double BetaS, const double BetaBV);
 
     static double i0(const Input& x);
+    static double i1(const Input& x);
+
+	static void init();
+	static void destroy();
+
+	static double* ToptRice;
+
+private:
+	static double optRice(double v);
 };
+
+template <class A, class B>
+double* RiceDataTerm<A, B>::ToptRice = NULL;
 
 #include "RiceDataTerm.hxx"
 
