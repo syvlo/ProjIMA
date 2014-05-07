@@ -17,8 +17,8 @@ ReadImw (const char* DimFileName,
 
     if (dimFile.is_open())
     {
-	dimFile >> height;
 	dimFile >> width;
+	dimFile >> height;
 	dimFile.close();
     }
     else
@@ -79,7 +79,7 @@ WriteImw (const cv::Mat		image,
 
     if (dimFile.is_open())
     {
-	dimFile << Height << " " << Width;
+		dimFile << Width << " " << Height;
 	dimFile.close();
     }
     else
