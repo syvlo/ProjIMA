@@ -6,6 +6,7 @@
 #include "Args.hh"
 #include "TVL0DecompositionMinimizer.hh"
 #include "ComputeByParts.hh"
+#include "ComputeByPartsLinear.hh"
 #include "QuadraticDataTerm.hh"
 #include "RayleighDataTerm.hh"
 #include "RayleighDataTerm2Vars.hh"
@@ -88,13 +89,14 @@ int main (int argc, char* argv[])
 		std::vector<cv::Mat> OutputsC;
 
 
-		RiceDataTerm<unsigned, unsigned>::init();
+//		RiceDataTerm<unsigned, unsigned>::init();
 
-		TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
+		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
 
 		if (args.getNonOptimalMode())
 		{
-			ComputeByParts<TVL0DecompositionMinimizer<RiceDataTerm<unsigned, unsigned> > > computer(100, 50, minimizer);
+			ComputeByPartsLinear<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, 25, minimizer);
+			//ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
 			computer.compute(inputs);
 
 			OutputsBV = computer.getOutputsBV();
@@ -149,7 +151,7 @@ int main (int argc, char* argv[])
 					WriteImw(OutputsC[i], OCName.c_str());
 			}
 		}
-		RiceDataTerm<unsigned, unsigned>::destroy();
+//		RiceDataTerm<unsigned, unsigned>::destroy();
     }
 
 
