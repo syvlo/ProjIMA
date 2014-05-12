@@ -95,13 +95,26 @@ int main (int argc, char* argv[])
 
 		if (args.getNonOptimalMode())
 		{
-			ComputeByPartsLinear<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, 25, minimizer);
-			//ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(100, 50, minimizer);
-			computer.compute(inputs);
+			if (args.getShiftWindow() != args.getFillingWindowSize())
+			{
+				ComputeByPartsLinear<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), minimizer);
 
-			OutputsBV = computer.getOutputsBV();
-			OutputsS = computer.getOutputsS();
-			OutputsC = computer.getOutputsC();
+				computer.compute(inputs);
+
+				OutputsBV = computer.getOutputsBV();
+				OutputsS = computer.getOutputsS();
+				OutputsC = computer.getOutputsC();
+			}
+			else
+			{
+				ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), minimizer);
+
+				computer.compute(inputs);
+
+				OutputsBV = computer.getOutputsBV();
+				OutputsS = computer.getOutputsS();
+				OutputsC = computer.getOutputsC();
+			}
 		}
 		else
 		{

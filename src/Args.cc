@@ -16,6 +16,7 @@ Args::Args (int argc, char* argv[])
     NonOptimalMode_ = DEFAULT_NON_OPTIMAL_MODE;
 	ComputeWindowSize_ = DEFAULT_COMPUTE_WINDOW_SIZE;
 	FillingWindowSize_ = DEFAULT_FILLING_WINDOW_SIZE;
+	ShiftWindow_ = DEFAULT_SHIFT_WINDOW;
     Help_ = false;
 
     for (int i = 1; i < argc; ++i)
@@ -54,6 +55,8 @@ Args::Args (int argc, char* argv[])
 	    ComputeWindowSize_ = atoi(argv[++i]);
 	else if (!strcmp("-fw", argv[i]) || !strcmp("--FillingWindow", argv[i]))
 	    FillingWindowSize_ = atoi(argv[++i]);
+	else if (!strcmp("-sw", argv[i]) || !strcmp("--ShiftWindow", argv[i]))
+	    ShiftWindow_ = atoi(argv[++i]);
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
 	    printHelp();
@@ -101,6 +104,7 @@ Args::printHelp() const
 			  << "* -no/--NonOptimal, switch to non optimal mode (for large images.)" << std::endl
 			  << "* -cw/--ComputeWindow, size of the window used for computations in non optimal mode." << std::endl
 			  << "* -fw/--FillingWindow, size of the window used for filling in non optimal mode." << std::endl
+			  << "* -sw/--ShiftWindow, shift of the window in non optimal mode." << std::endl
 			  << "* -h/--help, print this message;" << std::endl;
 }
 
@@ -176,6 +180,13 @@ Args::getFillingWindowSize() const
 	return FillingWindowSize_;
 }
 
+unsigned
+Args::getShiftWindow() const
+{
+	return ShiftWindow_;
+}
+
+
 
 std::ostream&
 operator<< (std::ostream& stream, const Args& args)
@@ -204,7 +215,8 @@ operator<< (std::ostream& stream, const Args& args)
 		stream << std::endl << "Compute window size = "
 			   << args.ComputeWindowSize_ << std::endl;
 		stream << "Filling window size = "
-			   << args.FillingWindowSize_;
+			   << args.FillingWindowSize_ << std::endl;
+		stream << "Shift for the window = " << args.ShiftWindow_;
 	}
 
     return stream;

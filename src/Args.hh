@@ -47,6 +47,11 @@
 # define DEFAULT_FILLING_WINDOW_SIZE (50)
 
 /**
+ * Default value for the shift of the window.
+ */
+# define DEFAULT_SHIFT_WINDOW (DEFAULT_FILLING_WINDOW_SIZE)
+
+/**
  * \class Args
  * \brief Defines program arguments and handle them.
  */
@@ -148,6 +153,12 @@ public:
 	 */
 	unsigned getFillingWindowSize() const;
 
+	/**
+	 * \brief		Getter for the shift for the window.
+	 * \return		The shift for the window.
+	 */
+	unsigned getShiftWindow() const;
+
     /**
      * \brief		Getter for Help_ bool.
      * \return		Help_;
@@ -222,6 +233,11 @@ private:
 	 * \brief		Size of the filling window.
 	 */
 	unsigned FillingWindowSize_;
+
+	/**
+	 * \brief		Shift of the window.
+	 */
+	unsigned ShiftWindow_;
 
     /**
      * \brief		Boolean to defines if help was called.
