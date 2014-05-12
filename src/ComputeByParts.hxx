@@ -80,9 +80,9 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 				std::vector<cv::Mat> OC = minimizer_.getOutputsComplete();
 				for (unsigned img_i = 0; img_i < inputs.size(); ++img_i)
 				{
-					for (int tmp_i = startIFill; tmp_i < endIFill; ++tmp_i)
+					for (int tmp_i = startIFill; tmp_i <= endIFill; ++tmp_i)
 					{
-						for (int tmp_j = startJFill; tmp_j < endJFill; ++tmp_j)
+						for (int tmp_j = startJFill; tmp_j <= endJFill; ++tmp_j)
 						{
 							if (inputs[0].type() == CV_8U)
 							{
