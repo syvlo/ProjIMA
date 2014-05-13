@@ -16,7 +16,12 @@ Currently, the project implements Rice, Rayleigh and Gaussian distributions to m
 ### Using the project
 This project uses CMake as a build system.
 
+* First, you need to download and install the lib [SAR](https://github.com/syvlo/LibSAR).
 * Make sure that CMake is installed on your system.
+* In CMakeLists.txt, replace this line to the path to the include dir where lies libSAR.
+```
+include_directories(/Path/to/libSAR/include/)
+```
 * Go in the directory of the project and type:
 ```
 cmake . && make
@@ -26,6 +31,7 @@ cmake . && make
 ```
 ./bin/Denoise -BBV 1 -BS 30 -i inputName -oBV outputNameBV -oS outputNameS -oC outputNameC [-r]
 ```
+
 This line will apply the decomposition on an image named inputName and will produce 3 images:
 
 * outputNameBV (The background image);

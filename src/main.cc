@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <ImwHelper.hh>
 #include <cv.h>
 #include <highgui.h>
 
@@ -12,7 +12,6 @@
 #include "RayleighDataTerm2Vars.hh"
 #include "RiceDataTerm.hh"
 #include "LogDataTerm.hh"
-#include "ImwHelper.hh"
 
 int main (int argc, char* argv[])
 {
