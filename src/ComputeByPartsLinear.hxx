@@ -40,7 +40,6 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 		for (unsigned j = 0; j < inputs[0].size().width - fillSize_;
 			 j += shiftSize_)
 		{
-			std::cout << i << " " << j << std::endl;
 			int endi = i + computeSize_;
 			if (endi >= inputs[0].size().height)
 				endi = inputs[0].size().height - 1;
@@ -111,15 +110,8 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 	{
 		for (int i = 0; i < inputs[0].size().height; ++i)
 		{
-			std::cout << std::endl;
 			for (int j = 0; j < inputs[0].size().width; ++j)
 			{
-				std::cout << (unsigned int)numberOfOverlapped.at<unsigned char>(i, j) << " ";
-				if (numberOfOverlapped.at<unsigned char>(i, j) == 0)
-				{
-					std::cerr << "numberOfOverlapped.at(" << i << ", " << j << ") = 0" << std::endl;
-					continue;
-				}
 				if (inputs[0].type() == CV_8U)
 				{
 					OutputsBV_[i_img].at<unsigned char>(i, j) /= numberOfOverlapped.at<unsigned char>(i, j);
