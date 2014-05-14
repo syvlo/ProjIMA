@@ -252,5 +252,25 @@ TVL0DecompositionMinimizer<DataTerm>::getOutputsComplete() const
     return OutputsComplete_;
 }
 
+template <typename DataTerm>
+const std::vector<unsigned>&
+TVL0DecompositionMinimizer<DataTerm>::getGamma() const
+{
+	return Gamma_;
+}
+
+template <typename DataTerm>
+const double
+TVL0DecompositionMinimizer<DataTerm>::getBetaS() const
+{
+	return BetaS_;
+}
+
+template <typename DataTerm>
+const double
+TVL0DecompositionMinimizer<DataTerm>::getBetaBV() const
+{
+	return BetaBV_;
+}
 
 #endif /* !TV_L0_DECOMPOSITION_MINIMIZER_HXX_ */

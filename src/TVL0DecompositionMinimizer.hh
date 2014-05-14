@@ -81,6 +81,27 @@ public:
      */
     const std::vector<cv::Mat> getOutputsComplete() const;
 
+	/**
+	 * \brief		Getter for gamma.
+	 * \return		Gamma_.
+	 */
+	const std::vector<unsigned>& getGamma() const;
+
+	/**
+	 * \brief		Getter for BetaS.
+	 * \return	    BetaS.
+	 */
+	const double getBetaS() const;
+
+	/**
+	 * \brief getter for BetaBV.
+	 * \return BetaBV.
+	 */
+	const double getBetaBV() const;
+
+	/** Typedef to use the dataterm in an other class. */
+	typedef DataTerm dataTerm;
+
 private:
     /**
      * Beta parameter for the bounded variation component.
