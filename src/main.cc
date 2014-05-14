@@ -108,7 +108,7 @@ int main (int argc, char* argv[])
 			{
 				ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), minimizer);
 
-				computer.compute(inputs, true);
+				computer.compute(inputs, args.getOneBVSeveralS());
 
 				OutputsBV = computer.getOutputsBV();
 				OutputsS = computer.getOutputsS();

@@ -52,6 +52,11 @@
 # define DEFAULT_SHIFT_WINDOW (DEFAULT_FILLING_WINDOW_SIZE)
 
 /**
+ * Default value for OneBVSeveralS_.
+ */
+# define DEFAULT_ONE_BV_SEVERAL_S (false)
+
+/**
  * \class Args
  * \brief Defines program arguments and handle them.
  */
@@ -159,6 +164,12 @@ public:
 	 */
 	unsigned getShiftWindow() const;
 
+	/**
+	 * \brief	    Getter for the OneBVSeveralS_ bool.
+	 * \return	    OneBVSeveralS_.
+	 */
+	bool getOneBVSeveralS() const;
+
     /**
      * \brief		Getter for Help_ bool.
      * \return		Help_;
@@ -238,6 +249,12 @@ private:
 	 * \brief		Shift of the window.
 	 */
 	unsigned ShiftWindow_;
+
+	/**
+	 * \brief		Boolean to defines if we have to apply the method "One
+	 *				BV, several S".
+	 */
+	bool OneBVSeveralS_;
 
     /**
      * \brief		Boolean to defines if help was called.

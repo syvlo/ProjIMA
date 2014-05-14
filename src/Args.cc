@@ -17,6 +17,7 @@ Args::Args (int argc, char* argv[])
 	ComputeWindowSize_ = DEFAULT_COMPUTE_WINDOW_SIZE;
 	FillingWindowSize_ = DEFAULT_FILLING_WINDOW_SIZE;
 	ShiftWindow_ = DEFAULT_SHIFT_WINDOW;
+	OneBVSeveralS_ = DEFAULT_ONE_BV_SEVERAL_S;
     Help_ = false;
 
     for (int i = 1; i < argc; ++i)
@@ -57,6 +58,8 @@ Args::Args (int argc, char* argv[])
 	    FillingWindowSize_ = atoi(argv[++i]);
 	else if (!strcmp("-sw", argv[i]) || !strcmp("--ShiftWindow", argv[i]))
 	    ShiftWindow_ = atoi(argv[++i]);
+	else if (!strcmp("-1BVSS", argv[i]) || !strcmp("--OneBVSeveralS", argv[i]))
+	    OneBVSeveralS_ = true;
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
 	    printHelp();
@@ -105,6 +108,7 @@ Args::printHelp() const
 			  << "* -cw/--ComputeWindow, size of the window used for computations in non optimal mode." << std::endl
 			  << "* -fw/--FillingWindow, size of the window used for filling in non optimal mode." << std::endl
 			  << "* -sw/--ShiftWindow, shift of the window in non optimal mode." << std::endl
+			  << "* -1BVSS/--OneBVSeveralS, switch for the OneBVSeveralS computation.;" << std::endl
 			  << "* -h/--help, print this message;" << std::endl;
 }
 
@@ -186,6 +190,12 @@ Args::getShiftWindow() const
 	return ShiftWindow_;
 }
 
+bool
+Args::getOneBVSeveralS() const
+{
+	return OneBVSeveralS_;
+}
+
 
 
 std::ostream&
@@ -209,6 +219,7 @@ operator<< (std::ostream& stream, const Args& args)
 	stream << "OutputImageComplete = " << args.OutputImageComplete_ << "," << std::endl;
     stream << "Window Mode = " << args.WindowMode_ << std::endl;
     stream << "Radar Mode = " << args.RadarMode_ << std::endl;
+    stream << "One BV, several S = " << args.OneBVSeveralS_ << std::endl;
 	stream << "Non optimal Mode = " << args.NonOptimalMode_;
 	if (args.NonOptimalMode_)
 	{
