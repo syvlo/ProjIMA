@@ -50,7 +50,7 @@ public:
 	 * \param	inputs	The input images.
 	 * \return	true if everything went OK, false otherwise.
 	 */
-    bool compute(const std::vector<cv::Mat> inputs);
+    bool compute(const std::vector<cv::Mat> inputs, bool oneBVSeveralS);
 
 	/**
 	 * \brief Return the Bounded variations images.

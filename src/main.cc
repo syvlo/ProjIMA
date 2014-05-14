@@ -108,7 +108,7 @@ int main (int argc, char* argv[])
 			{
 				ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), minimizer);
 
-				computer.compute(inputs);
+				computer.compute(inputs, true);
 
 				OutputsBV = computer.getOutputsBV();
 				OutputsS = computer.getOutputsS();
@@ -124,7 +124,7 @@ int main (int argc, char* argv[])
 			OutputsC = minimizer.getOutputsComplete();
 		}
 
-		for (unsigned i = 0; i < OutputsBV.size(); ++i)
+		for (unsigned i = 0; i < inputs.size(); ++i)
 		{
 			std::string OBVName(args.getOutputImageBV());
 			if (OutputsBV.size() > 1)
@@ -142,11 +142,14 @@ int main (int argc, char* argv[])
 			}
 
 
-			std::clog << "Writing BV image to " << OBVName << std::endl;
-			if (!args.getRadarMode())
-				cv::imwrite(OBVName, OutputsBV[i]);
-			else
-				WriteImw(OutputsBV[i], OBVName.c_str());
+			if (i < OutputsBV.size())
+			{
+				std::clog << "Writing BV image to " << OBVName << std::endl;
+				if (!args.getRadarMode())
+					cv::imwrite(OBVName, OutputsBV[i]);
+				else
+					WriteImw(OutputsBV[i], OBVName.c_str());
+			}
 
 			std::clog << "Writing S image to " << OSName << std::endl;
 			if (!args.getRadarMode())

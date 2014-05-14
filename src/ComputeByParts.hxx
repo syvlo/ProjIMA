@@ -18,14 +18,16 @@ ComputeByParts<Minimizer>::~ComputeByParts()
 
 template <typename Minimizer>
 bool
-ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
+ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs,
+								   bool oneBVSeveralS)
 {
 	if (inputs.size() == 0)
 		return false;
 
 	for (unsigned i = 0; i < inputs.size(); ++i)
 	{
-		OutputsBV_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
+		if (!oneBVSeveralS || i == 0)
+			OutputsBV_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
 		OutputsS_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
 		OutputsC_.push_back(cv::Mat(inputs[0].size(), inputs[0].type()));
 	}
@@ -48,11 +50,30 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 
 			cv::Rect ComputeRegion(j, i, endj - j, endi - i);
 			std::vector<cv::Mat> inputsCropped;
-			for (unsigned i_img = 0; i_img < inputs.size(); ++i_img)
+			if (oneBVSeveralS) //We do a mean in intensity.
 			{
-				inputsCropped.push_back(inputs[i_img](ComputeRegion));
-			}
+				inputsCropped.push_back(cv::Mat(cv::Size(endj - j, endi - i), CV_16U));
 
+				for (int ii = i; ii < endi; ++ii)
+					for (int jj = j; jj < endj; ++jj)
+					{
+						double value = 0;
+						for (unsigned i_img = 0; i_img < inputs.size(); ++i_img)
+						{
+							unsigned tmp = inputs[i_img].at<unsigned short>(ii, jj);
+							value += tmp * tmp;
+						}
+						value = sqrt(value / inputs.size());
+						inputsCropped[0].at<unsigned short>(ii - i, jj - j) = (unsigned short)value;
+					}
+			}
+			else
+			{
+				for (unsigned i_img = 0; i_img < inputs.size(); ++i_img)
+				{
+					inputsCropped.push_back(inputs[i_img](ComputeRegion));
+				}
+			}
 
 			int startIFill = i + (computeSize_ - fillSize_) / 2;
 			if (i == 0)
@@ -78,23 +99,26 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 				std::vector<cv::Mat> OBV = minimizer_.getOutputsBV();
 				std::vector<cv::Mat> OS = minimizer_.getOutputsS();
 				std::vector<cv::Mat> OC = minimizer_.getOutputsComplete();
-				for (unsigned img_i = 0; img_i < inputs.size(); ++img_i)
+				for (unsigned img_i = 0; img_i < inputsCropped.size(); ++img_i)
 				{
 					for (int tmp_i = startIFill; tmp_i <= endIFill; ++tmp_i)
 					{
 						for (int tmp_j = startJFill; tmp_j <= endJFill; ++tmp_j)
 						{
-							if (inputs[0].type() == CV_8U)
+							if (!oneBVSeveralS || img_i == 0)
 							{
-								OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) = OBV[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
-								OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) = OS[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
-								OutputsC_[img_i].at<unsigned char>(tmp_i, tmp_j) = OC[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
-							}
-							else
-							{
-								OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) = OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
-								OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j) = OS[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
-								OutputsC_[img_i].at<unsigned short>(tmp_i, tmp_j) = OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) + OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j);
+								if (inputs[0].type() == CV_8U)
+								{
+									OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) = OBV[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+									OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) = OS[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+									OutputsC_[img_i].at<unsigned char>(tmp_i, tmp_j) = OC[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+								}
+								else
+								{
+									OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) = OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
+									OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j) = OS[img_i].at<unsigned short>(tmp_i - i, tmp_j - j);
+									OutputsC_[img_i].at<unsigned short>(tmp_i, tmp_j) = OutputsBV_[img_i].at<unsigned short>(tmp_i, tmp_j) + OutputsS_[img_i].at<unsigned short>(tmp_i, tmp_j);
+								}
 							}
 						}
 					}
@@ -106,6 +130,25 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 			}
 		}
     }
+	if (oneBVSeveralS)
+	{
+		const std::vector<unsigned>& gamma = minimizer_.getGamma();
+		const double BetaS = minimizer_.getBetaS();
+		const double BetaBV = minimizer_.getBetaBV();
+
+		for (unsigned img_i = 0; img_i < inputs.size(); ++img_i)
+		{
+			for (int i = 0; i < inputs[0].size().height; ++i)
+				for (int j = 0; j < inputs[0].size().width; ++j)
+				{
+					unsigned short V = inputs[img_i].at<unsigned short>(i, j);
+					unsigned short UBV = OutputsBV_[0].at<unsigned short>(i, j);
+					OutputsS_[img_i].at<unsigned short>(i, j) = Minimizer::dataTerm::ComputeUs(V, UBV, gamma, BetaS, BetaBV);
+					OutputsC_[img_i].at<unsigned short>(i, j) = OutputsS_[img_i].at<unsigned short>(i, j)
+						+ OutputsBV_[0].at<unsigned short>(i, j);
+				}
+		}
+	}
 
 
     return true;
