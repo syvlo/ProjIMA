@@ -43,11 +43,9 @@ int main (int argc, char* argv[])
 
 
 		// //For a log (* 100) distribution
-		// for (unsigned i = 0; i < 500; i+= 100)
+		// for (unsigned i = 0; i < 500; i+= 10)
 		// 	alpha.push_back(i);
-		// for (unsigned i = 500; i < 1500; i += 40)
-		// 	alpha.push_back(i);
-		// for (unsigned i = 1500; i < 2000; i += 100)
+		// for (unsigned i = 500; i < 1500; i += 100)
 		// 	alpha.push_back(i);
     }
 
