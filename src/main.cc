@@ -4,14 +4,12 @@
 #include <highgui.h>
 
 #include "Args.hh"
-#include "TVL0DecompositionMinimizer.hh"
-#include "ComputeByParts.hh"
-#include "ComputeByPartsLinear.hh"
 #include "QuadraticDataTerm.hh"
 #include "RayleighDataTerm.hh"
 #include "RayleighDataTerm2Vars.hh"
 #include "RiceDataTerm.hh"
 #include "LogDataTerm.hh"
+#include "Engine.hh"
 
 int main (int argc, char* argv[])
 {
@@ -85,42 +83,9 @@ int main (int argc, char* argv[])
 		std::vector<cv::Mat> OutputsS;
 		std::vector<cv::Mat> OutputsC;
 
+		Engine<RayleighDataTerm2Vars<unsigned, unsigned> > engine (args, alpha, gamma);
+		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC);
 
-//		RiceDataTerm<unsigned, unsigned>::init();
-
-		TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > minimizer(alpha, gamma, args.getBetaBV(), args.getBetaS());
-
-		if (args.getNonOptimalMode())
-		{
-			if (args.getShiftWindow() != args.getFillingWindowSize())
-			{
-				ComputeByPartsLinear<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), minimizer);
-
-				computer.compute(inputs);
-
-				OutputsBV = computer.getOutputsBV();
-				OutputsS = computer.getOutputsS();
-				OutputsC = computer.getOutputsC();
-			}
-			else
-			{
-				ComputeByParts<TVL0DecompositionMinimizer<RayleighDataTerm2Vars<unsigned, unsigned> > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), minimizer);
-
-				computer.compute(inputs, args.getOneBVSeveralS());
-
-				OutputsBV = computer.getOutputsBV();
-				OutputsS = computer.getOutputsS();
-				OutputsC = computer.getOutputsC();
-			}
-		}
-		else
-		{
-			minimizer.compute(inputs);
-
-			OutputsBV = minimizer.getOutputsBV();
-			OutputsS = minimizer.getOutputsS();
-			OutputsC = minimizer.getOutputsComplete();
-		}
 
 		for (unsigned i = 0; i < inputs.size(); ++i)
 		{
@@ -164,7 +129,6 @@ int main (int argc, char* argv[])
 					WriteImw(OutputsC[i], OCName.c_str());
 			}
 		}
-//		RiceDataTerm<unsigned, unsigned>::destroy();
     }
 
 
