@@ -54,25 +54,7 @@ LogDataTerm<Input,Output>::ComputeUs(const Input& V,
     if (tmp < BetaS / BetaBV)
 		return 0;
 
-	//FIX ME
-    double minValue = std::numeric_limits<double>::max();
-
-    Output min;
-    for (typename std::vector<Input>::const_iterator it = gamma.begin(); it != gamma.end(); ++it)
-    {
-	double val = ComputeDataTermOnly(V, Ubv, *it, BetaBV);
-	if (val < minValue)
-	{
-	    minValue = val;
-	    min = *it;
-	}
-    }
-
-    if (minValue + BetaS < ComputeDataTermOnly(V, Ubv, 0, BetaBV))
-	return min;
-    else
-	return 0;
-
+	return V - Ubv;
 }
 
 
