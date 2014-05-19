@@ -84,6 +84,34 @@ Args::~Args()
 	delete[] OutputImageComplete_;
 }
 
+Args::Args(const Args& other)
+{
+	BetaS_ = other.BetaS_;
+	BetaBV_ = other.BetaBV_;
+	for (std::vector<char*>::const_iterator it = other.InputImages_.begin();
+		 it != other.InputImages_.end(); ++it)
+	{
+		InputImages_.push_back(new char[std::strlen(*it)]);
+		std::strcpy(InputImages_[InputImages_.size() - 1],
+					other.InputImages_[InputImages_.size() - 1]);
+	}
+	OutputImageBV_ = new char[std::strlen(other.OutputImageBV_) + 1];
+	std::strcpy(OutputImageBV_, other.OutputImageBV_);
+	OutputImageS_ = new char[std::strlen(other.OutputImageS_) + 1];
+	std::strcpy(OutputImageS_, other.OutputImageS_);
+	OutputImageComplete_ = new char[std::strlen(other.OutputImageComplete_)
+									+ 1];
+	std::strcpy(OutputImageComplete_, other.OutputImageComplete_);
+	WindowMode_ = other.WindowMode_;
+	RadarMode_ = other.RadarMode_;
+	NonOptimalMode_ = other.NonOptimalMode_;
+	ComputeWindowSize_ = other.ComputeWindowSize_;
+	FillingWindowSize_ = other.FillingWindowSize_;
+	ShiftWindow_ = other.ShiftWindow_;
+	OneBVSeveralS_ = other.OneBVSeveralS_;
+	Help_ = other.Help_;
+}
+
 bool
 Args::checkConsistency() const
 {

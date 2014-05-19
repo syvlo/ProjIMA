@@ -77,6 +77,12 @@ public:
      */
     ~Args();
 
+	/**
+	 * \brief		Copy constructor
+	 * \param	    other		The args to copy.
+	 */
+	Args(const Args& other);
+
     /**
      * \brief		Check consistency among parsed arguments.
      * \details		Check, if we are not in window mode, that filenames
