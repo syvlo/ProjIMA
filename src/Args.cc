@@ -18,6 +18,7 @@ Args::Args (int argc, char* argv[])
 	FillingWindowSize_ = DEFAULT_FILLING_WINDOW_SIZE;
 	ShiftWindow_ = DEFAULT_SHIFT_WINDOW;
 	OneBVSeveralS_ = DEFAULT_ONE_BV_SEVERAL_S;
+	dataterm_ = DEFAULT_DATATERM;
     Help_ = false;
 
     for (int i = 1; i < argc; ++i)
@@ -60,6 +61,22 @@ Args::Args (int argc, char* argv[])
 	    ShiftWindow_ = atoi(argv[++i]);
 	else if (!strcmp("-1BVSS", argv[i]) || !strcmp("--OneBVSeveralS", argv[i]))
 	    OneBVSeveralS_ = true;
+	else if (!strcmp("-dt", argv[i]) || !strcmp("--DataTerm", argv[i]))
+	{
+		i += 1;
+		if (!strcmp("Rice", argv[i]))
+			dataterm_ = RICE;
+		else if (!strcmp("Rayleigh", argv[i]))
+			dataterm_ = RAYLEIGH;
+		else if (!strcmp("Log", argv[i]))
+			dataterm_ = LOG;
+		else
+			std::cerr << "Did not understood value for dataterm." << std::endl
+					  << "Possible values are:" << std::endl
+					  << " * Rice" << std::endl
+					  << " * Rayleigh" << std::endl
+					  << " * Log" << std::endl;
+	}
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
 	    printHelp();
@@ -93,7 +110,7 @@ Args::Args(const Args& other)
 	{
 		InputImages_.push_back(new char[std::strlen(*it)]);
 		std::strcpy(InputImages_[InputImages_.size() - 1],
-					other.InputImages_[InputImages_.size() - 1]);
+					*it);
 	}
 	OutputImageBV_ = new char[std::strlen(other.OutputImageBV_) + 1];
 	std::strcpy(OutputImageBV_, other.OutputImageBV_);
@@ -109,6 +126,7 @@ Args::Args(const Args& other)
 	FillingWindowSize_ = other.FillingWindowSize_;
 	ShiftWindow_ = other.ShiftWindow_;
 	OneBVSeveralS_ = other.OneBVSeveralS_;
+	dataterm_ = other.dataterm_;
 	Help_ = other.Help_;
 }
 
@@ -124,6 +142,11 @@ void
 Args::printHelp() const
 {
     std::cout << "Available parameters:" << std::endl
+			  << "* -dt/--DataTerm, data term to be used." << std::endl
+			  << "  Possible values are:" << std::endl
+			  << "  * Rice" << std::endl
+			  << "  * Rayleigh" << std::endl
+			  << "  * Log" << std::endl
 			  << "* -BBV/--BetaBV <value>, BetaBV;" << std::endl
 			  << "* -BS/--BetaS <value>, BetaS;" << std::endl
 			  << "* -i/--InputImage <value>, image to be denoised. You can add several images by repeating argument." << std::endl
@@ -224,13 +247,27 @@ Args::getOneBVSeveralS() const
 	return OneBVSeveralS_;
 }
 
+DataTerm
+Args::getDataTerm() const
+{
+	return dataterm_;
+}
+
 
 
 std::ostream&
 operator<< (std::ostream& stream, const Args& args)
 {
     stream << "BetaBV = " << args.BetaBV_ << "," << std::endl
-	   << "BetaS = " << args.BetaS_ << "," << std::endl;
+		   << "BetaS = " << args.BetaS_ << "," << std::endl
+		   << "DataTerm = ";
+	if (args.dataterm_ == RICE)
+		stream << "Rice";
+	else if (args.dataterm_ == RAYLEIGH)
+		stream << "Rayleigh";
+	else if (args.dataterm_ == LOG)
+		stream << "Log";
+	stream << "," << std::endl;
 
 	unsigned i = 0;
 	for (std::vector<char*>::const_iterator it = args.InputImages_.begin();

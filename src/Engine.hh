@@ -24,7 +24,7 @@ public:
 	 * \param  alpha	Vector of quantified values for BV.
 	 * \param  gamma	Vector of quantified values for S.
 	 */
-	Engine(const Args& args, const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma);
+	Engine(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma);
 
 	/**
 	 * \brief  Destructor
@@ -41,10 +41,10 @@ public:
 	void Compute(const std::vector<cv::Mat>& Inputs,
 				 std::vector<cv::Mat>& OutputsBV,
 				 std::vector<cv::Mat>& OutputsS,
-				 std::vector<cv::Mat>& OutputsC);
+				 std::vector<cv::Mat>& OutputsC,
+				 const Args& args);
 
 private:
-	const Args					args_;
 	const std::vector<unsigned> alpha_;
 	const std::vector<unsigned> gamma_;
 

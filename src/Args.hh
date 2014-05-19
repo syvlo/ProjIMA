@@ -57,6 +57,21 @@
 # define DEFAULT_ONE_BV_SEVERAL_S (false)
 
 /**
+ * Default value for dataterm_;
+ */
+# define DEFAULT_DATATERM (RAYLEIGH)
+
+/**
+ * \brief Enum to represent the dataterm to be used.
+ */
+typedef enum
+{
+	RICE, /**< Use Rice dataterm. */
+	RAYLEIGH, /**< Use Rayleigh dataterm. */
+	LOG /**< Use Fisher-Tippet dataterm */
+} DataTerm;
+
+/**
  * \class Args
  * \brief Defines program arguments and handle them.
  */
@@ -176,6 +191,12 @@ public:
 	 */
 	bool getOneBVSeveralS() const;
 
+	/**
+	 * \brief		Getter for the Dataterm.
+	 * \return		The dataterm.
+	 */
+	DataTerm getDataTerm () const;
+
     /**
      * \brief		Getter for Help_ bool.
      * \return		Help_;
@@ -261,6 +282,11 @@ private:
 	 *				BV, several S".
 	 */
 	bool OneBVSeveralS_;
+
+	/**
+	 * \brief	    The dataterm to be used.
+	 */
+	DataTerm dataterm_;
 
     /**
      * \brief		Boolean to defines if help was called.

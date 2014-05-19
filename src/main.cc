@@ -39,12 +39,16 @@ int main (int argc, char* argv[])
     	for (unsigned i = 800; i < 3000; i += 100)
     	    alpha.push_back(i);
 
-
-		// //For a log (* 100) distribution
-		// for (unsigned i = 0; i < 500; i+= 10)
-		// 	alpha.push_back(i);
-		// for (unsigned i = 500; i < 1500; i += 100)
-		// 	alpha.push_back(i);
+		if (args.getDataTerm() == LOG)
+		{
+			//For a log (* 100) distribution
+			for (unsigned i = 0; i < alpha.size(); ++i)
+			{
+				double var = alpha[i];
+				var = log(var * 100);
+				alpha[i] = (unsigned)var;
+			}
+		}
     }
 
     //Gamma definition (labels for S image).
@@ -83,8 +87,21 @@ int main (int argc, char* argv[])
 		std::vector<cv::Mat> OutputsS;
 		std::vector<cv::Mat> OutputsC;
 
-		Engine<RayleighDataTerm2Vars<unsigned, unsigned> > engine (args, alpha, gamma);
-		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC);
+		if (args.getDataTerm() == RAYLEIGH)
+		{
+			Engine<RayleighDataTerm2Vars<unsigned, unsigned> > engine (alpha, gamma);
+			engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
+		}
+		else if (args.getDataTerm() == RICE)
+		{
+			Engine<RiceDataTerm<unsigned, unsigned> > engine (alpha, gamma);
+			engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
+		}
+		else if (args.getDataTerm() == LOG)
+		{
+			Engine<LogDataTerm<unsigned, unsigned> > engine (alpha, gamma);
+			engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
+		}
 
 
 		for (unsigned i = 0; i < inputs.size(); ++i)
