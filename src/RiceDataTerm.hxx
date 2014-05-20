@@ -7,7 +7,7 @@
 # include <fstream>
 
 //Set to false after having run once to save a lot of time...
-# define FIRSTTIME (true)
+# define FIRSTTIME (false)
 # define SAVERICE (true)
 
 template <typename Input, typename Output>
@@ -18,7 +18,7 @@ RiceDataTerm<Input,Output>::Compute(const Input& V,
 									const double BetaS,
 									const double BetaBV)
 {
-	if (V >= Ubv)
+	if (V <= Ubv)
 	{
 		Input Us = 0;
 		return ComputeDataTermOnly(V, Ubv, Us, BetaBV);
