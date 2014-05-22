@@ -45,7 +45,7 @@ int main (int argc, char* argv[])
 			for (unsigned i = 0; i < alpha.size(); ++i)
 			{
 				double var = alpha[i];
-				var = log(var * 100);
+				var = log(var) * 100;
 				alpha[i] = (unsigned)var;
 			}
 		}
