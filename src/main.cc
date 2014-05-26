@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+
 #include <ImwHelper.hh>
 #include <cv.h>
 #include <highgui.h>
@@ -10,6 +12,7 @@
 #include "RiceDataTerm.hh"
 #include "LogDataTerm.hh"
 #include "Engine.hh"
+#include "utils.hh"
 
 int main (int argc, char* argv[])
 {
@@ -26,30 +29,19 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    //Alpha definition (labels for BV image).
-    std::vector<unsigned> alpha;
-    if (!args.getRadarMode())
-    	for (unsigned i = 0; i < 255; ++i)
-    	    alpha.push_back(i);
-    else
-    {
-		//For almost all radar distribution, this should be used.
-    	for (unsigned i = 0; i < 800; i += 40)
-    	    alpha.push_back(i);
-    	for (unsigned i = 800; i < 3000; i += 100)
-    	    alpha.push_back(i);
+    /////////////////////////////////////////////
+    // Alpha definition (labels for BV image). //
+    /////////////////////////////////////////////
+	//Define schemes. Each scheme is {minVal, maxVal, step}.
+	std::vector<misc::Scheme> schemesRadar {{0, 800, 40}, {800, 3000, 100}};
+	std::vector<misc::Scheme> schemesNormal {{0, 255, 1}};
+	//Construct alpha from schemes.
+    std::vector<unsigned> alpha = misc::constructAlpha(args.getRadarMode(),
+													   args.getDataTerm(),
+													   (args.getRadarMode() ?
+														schemesRadar :
+														schemesNormal));
 
-		if (args.getDataTerm() == LOG)
-		{
-			//For a log (* 100) distribution
-			for (unsigned i = 0; i < alpha.size(); ++i)
-			{
-				double var = alpha[i];
-				var = log(var) * 100;
-				alpha[i] = (unsigned)var;
-			}
-		}
-    }
 
     //Gamma definition (labels for S image).
     std::vector<unsigned> gamma;
