@@ -22,9 +22,8 @@ public:
 	 * \brief  Constructor
 	 * \param  Args		The arguments for the engine.
 	 * \param  alpha	Vector of quantified values for BV.
-	 * \param  gamma	Vector of quantified values for S.
 	 */
-	Engine(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma);
+	Engine(const std::vector<unsigned>& alpha);
 
 	/**
 	 * \brief  Destructor
@@ -46,7 +45,6 @@ public:
 
 private:
 	const std::vector<unsigned> alpha_;
-	const std::vector<unsigned> gamma_;
 
 	/**
 	 * \brief  Initialisation method (called by constructor).

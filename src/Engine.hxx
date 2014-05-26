@@ -8,10 +8,8 @@
 
 
 template <typename Minimizer>
-Engine<Minimizer>::Engine(const std::vector<unsigned>& alpha,
-						  const std::vector<unsigned>& gamma)
-	: alpha_(alpha),
-	  gamma_(gamma)
+Engine<Minimizer>::Engine(const std::vector<unsigned>& alpha)
+	: alpha_(alpha)
 {
 	this->init();
 }
@@ -30,7 +28,7 @@ Engine<Minimizer>::Compute(const std::vector<cv::Mat>& Inputs,
 						   std::vector<cv::Mat>& OutputsC,
 						   const Args& args)
 {
-	TVL0DecompositionMinimizer<Minimizer> TVL0 (alpha_, gamma_,
+	TVL0DecompositionMinimizer<Minimizer> TVL0 (alpha_,
 												args.getBetaBV(),
 												args.getBetaS());
 	if (args.getNonOptimalMode())

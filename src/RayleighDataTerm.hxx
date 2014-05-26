@@ -6,9 +6,8 @@
 template <typename Input, typename Output>
 Output
 RayleighDataTerm<Input,Output>::Compute(const Input& ObservedValue,
-					const Input& RegularizedValue,
-					const std::vector<Input>&,
-					const double)
+										const Input& RegularizedValue,
+										const double)
 {
     return static_cast<Output> ((ObservedValue * ObservedValue)
 				/ (RegularizedValue * RegularizedValue)
@@ -17,8 +16,9 @@ RayleighDataTerm<Input,Output>::Compute(const Input& ObservedValue,
 
 template <typename Input, typename Output>
 Output
-RayleighDataTerm<Input,Output>::ComputeUs(const Input&, const Input&,
-					  const std::vector<Input>&, const double)
+RayleighDataTerm<Input,Output>::ComputeUs(const Input&,
+										  const Input&,
+										  const double)
 {
     return 0;
 }

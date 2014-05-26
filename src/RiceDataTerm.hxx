@@ -8,13 +8,12 @@
 
 //Set to false after having run once to save a lot of time...
 # define FIRSTTIME (false)
-# define SAVERICE (true)
+# define SAVERICE (false)
 
 template <typename Input, typename Output>
 double
 RiceDataTerm<Input,Output>::Compute(const Input& V,
 									const Input& Ubv,
-									const std::vector<Input>& gamma,
 									const double BetaS,
 									const double BetaBV)
 {
@@ -24,7 +23,7 @@ RiceDataTerm<Input,Output>::Compute(const Input& V,
 		return ComputeDataTermOnly(V, Ubv, Us, BetaBV);
 	}
 
-    Input Us = RiceDataTerm<Input,Output>::ComputeUs(V, Ubv, gamma, BetaS, BetaBV);
+    Input Us = RiceDataTerm<Input,Output>::ComputeUs(V, Ubv, BetaS, BetaBV);
 
     if (Us == 0)
 		return ComputeDataTermOnly(V, Ubv, Us, BetaBV);
@@ -52,7 +51,6 @@ template <typename Input, typename Output>
 Output
 RiceDataTerm<Input,Output>::ComputeUs(const Input& V,
 									  const Input& Ubv,
-									  const std::vector<Input>& gamma,
 									  const double BetaS,
 									  const double BetaBV)
 {

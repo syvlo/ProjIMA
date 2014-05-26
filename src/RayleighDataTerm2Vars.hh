@@ -12,24 +12,53 @@
 
 /**
  * \class RayleighDataTerm2Vars
- * \brief Class to be used to compute the data term for a Rice distribution
- *	  noise based.
+ * \brief Class to be used to compute the data term for a noise based on a
+ *        Rice distribution
+ *		  This one should be used on normal images when RayleighDataTerm
+ *		  should be used on classic images.
  */
+
 template <typename Input, typename Output>
 class RayleighDataTerm2Vars
 {
 public:
     /**
      * \brief	Method to compute the data term
-     * \param	ObservedValue		Observed value (i.e. y_s).
-     * \param	RegularizedValue	Value to be tested (i.e. x_s)
+     * \param	V		Observed value.
+     * \param	Ubv		Value to be tested.
+	 * \param	BetaS	Value for the L0 parameter.
+	 * \param	BetaBV	Value for the TV parameter.
      * \return  The value for the data term.
      */
-    static double Compute(const Input& V, const Input& Ubv, const std::vector<Input>& gamma, const double BetaS, const double BetaBv);
+    static double Compute(const Input& V,
+						  const Input& Ubv,
+						  const double BetaS,
+						  const double BetaBv);
 
-    static double ComputeDataTermOnly(const Input& ObservedValue, const Input& RegularizedValue, const Input& Us, const double BetaBV);
+	/**
+	 * \brief	Given an Us compute the data term.
+	 * \param   ObservedValue			The observed value.
+	 * \param	RegularizedValue		Regularized value chosen.
+	 * \param	Us						The value chosen for Us.
+	 * \param	BetaBV					Regularization parameter for TV.
+	 */
+    static double ComputeDataTermOnly(const Input& ObservedValue,
+									  const Input& RegularizedValue,
+									  const Input& Us,
+									  const double BetaBV);
 
-    static Output ComputeUs(const Input& V, const Input& Ubv, const std::vector<Input>& gamma, const double BetaS, const double BetaBV);
+	/**
+     * \brief	Method to compute Us?
+     * \param	V		Observed value.
+     * \param	Ubv		Value to be tested.
+	 * \param	BetaS	Value for the L0 parameter.
+	 * \param	BetaBV	Value for the TV parameter.
+     * \return  The value for Us.
+     */
+    static Output ComputeUs(const Input& V,
+							const Input& Ubv,
+							const double BetaS,
+							const double BetaBV);
 };
 
 #include "RayleighDataTerm2Vars.hxx"

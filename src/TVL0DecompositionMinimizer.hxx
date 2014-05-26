@@ -12,14 +12,18 @@
 #define INFTY 1E20
 
 template <typename DataTerm>
-TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma)
-	: BetaBV_(DEFAULT_BBV), BetaS_(DEFAULT_BS), Alpha_(alpha), Gamma_(gamma)
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha)
+	: BetaBV_(DEFAULT_BBV),
+	  BetaS_(DEFAULT_BS),
+	  Alpha_(alpha)
 {
 }
 
 template <typename DataTerm>
-TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma, double BetaBV, double BetaS)
-    : BetaBV_(BetaBV), BetaS_(BetaS), Alpha_(alpha), Gamma_(gamma)
+TVL0DecompositionMinimizer<DataTerm>::TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, double BetaBV, double BetaS)
+    : BetaBV_(BetaBV),
+	  BetaS_(BetaS),
+	  Alpha_(alpha)
 {
 }
 
@@ -83,23 +87,23 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 						g->add_edge(nodes[current + (level - 1) * nbPix],
 									nodes[current + level * nbPix],
 									INFTY,
-									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j), Alpha_[level], BetaS_, BetaBV_));
 					else
 						g->add_edge(nodes[current + (level - 1) * nbPix],
 									nodes[current + level * nbPix],
 									INFTY,
-									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j), Alpha_[level], Gamma_, BetaS_, BetaBV_));
+									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j), Alpha_[level],  BetaS_, BetaBV_));
 				}
 
 				//Last one is linked to the source
 				if (type == CV_8U)
 					g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j),
-													  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
+													  Alpha_[nbAlpha - 1], BetaS_, BetaBV_), 0);
 				else
 					g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
 									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j),
-													  Alpha_[nbAlpha - 1], Gamma_, BetaS_, BetaBV_), 0);
+													  Alpha_[nbAlpha - 1], BetaS_, BetaBV_), 0);
 
 				//////////////////////////////////////////////
 				// Links definition for regularization term //
@@ -163,7 +167,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[0];
 					OutputsS_[i_img].at<unsigned char>(i, j) =
 						DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
-											Alpha_[0], Gamma_, BetaS_, BetaBV_);
+											Alpha_[0], BetaS_, BetaBV_);
 					OutputsComplete_[i_img].at<unsigned char>(i, j) =
 						OutputsBV_[i_img].at<unsigned char>(i, j)
 						+ OutputsS_[i_img].at<unsigned char>(i, j);
@@ -173,7 +177,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[0];
 					OutputsS_[i_img].at<unsigned short>(i, j) =
 						DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
-											Alpha_[0], Gamma_, BetaS_, BetaBV_);
+											Alpha_[0], BetaS_, BetaBV_);
 					OutputsComplete_[i_img].at<unsigned short>(i, j) =
 						OutputsBV_[i_img].at<unsigned short>(i, j)
 						+ OutputsS_[i_img].at<unsigned short>(i, j);
@@ -189,7 +193,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level];
 							OutputsS_[i_img].at<unsigned char>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
-													Alpha_[level], Gamma_, BetaS_, BetaBV_);
+													Alpha_[level], BetaS_, BetaBV_);
 							OutputsComplete_[i_img].at<unsigned char>(i, j) =
 								OutputsBV_[i_img].at<unsigned char>(i, j)
 								+ OutputsS_[i_img].at<unsigned char>(i, j);
@@ -199,7 +203,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level];
 							OutputsS_[i_img].at<unsigned short>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
-													Alpha_[level], Gamma_, BetaS_, BetaBV_);
+													Alpha_[level], BetaS_, BetaBV_);
 							OutputsComplete_[i_img].at<unsigned short>(i, j) =
 								OutputsBV_[i_img].at<unsigned short>(i, j)
 								+ OutputsS_[i_img].at<unsigned short>(i, j);
@@ -250,13 +254,6 @@ const std::vector<cv::Mat>
 TVL0DecompositionMinimizer<DataTerm>::getOutputsComplete() const
 {
     return OutputsComplete_;
-}
-
-template <typename DataTerm>
-const std::vector<unsigned>&
-TVL0DecompositionMinimizer<DataTerm>::getGamma() const
-{
-	return Gamma_;
 }
 
 template <typename DataTerm>

@@ -6,9 +6,8 @@
 template <typename Input, typename Output>
 Output
 QuadraticDataTerm<Input,Output>::Compute(const Input& ObservedValue,
-					 const Input& RegularizedValue,
-					 const std::vector<Input>&,
-					 const double)
+										 const Input& RegularizedValue,
+										 const double)
 {
     return static_cast<Output> ((ObservedValue - RegularizedValue)
 				* (ObservedValue - RegularizedValue));
@@ -16,8 +15,9 @@ QuadraticDataTerm<Input,Output>::Compute(const Input& ObservedValue,
 
 template <typename Input, typename Output>
 Output
-QuadraticDataTerm<Input,Output>::ComputeUs(const Input&, const Input&,
-					   const std::vector<Input>&, const double)
+QuadraticDataTerm<Input,Output>::ComputeUs(const Input&,
+										   const Input&,
+										   const double)
 {
     return 0;
 }

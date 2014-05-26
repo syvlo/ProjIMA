@@ -132,7 +132,6 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs,
     }
 	if (oneBVSeveralS)
 	{
-		const std::vector<unsigned>& gamma = minimizer_.getGamma();
 		const double BetaS = minimizer_.getBetaS();
 		const double BetaBV = minimizer_.getBetaBV();
 
@@ -143,7 +142,7 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs,
 				{
 					unsigned short V = inputs[img_i].at<unsigned short>(i, j);
 					unsigned short UBV = OutputsBV_[0].at<unsigned short>(i, j);
-					OutputsS_[img_i].at<unsigned short>(i, j) = Minimizer::dataTerm::ComputeUs(V, UBV, gamma, BetaS, BetaBV);
+					OutputsS_[img_i].at<unsigned short>(i, j) = Minimizer::dataTerm::ComputeUs(V, UBV, BetaS, BetaBV);
 					OutputsC_[img_i].at<unsigned short>(i, j) = OutputsS_[img_i].at<unsigned short>(i, j)
 						+ OutputsBV_[0].at<unsigned short>(i, j);
 				}

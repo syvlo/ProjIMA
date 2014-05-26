@@ -24,18 +24,16 @@ public:
      * \brief		Default constructor.
      * \details		Will use default values for betas.
      * \param		alpha Look-up table for the values of alpha_i.
-     * \param		gamma Look-up table for the values of gamma_i.
      */
-    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma);
+    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha);
 
     /**
      * \brief		Constructor.
      * \param		alpha Look-up table for the values of alpha_i.
-     * \param		gamma Look-up table for the values of gamma_i.
      * \param		BetaBV	Value for BetaBV.
      * \param		BetaS	Value for BetaS.
      */
-    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, const std::vector<unsigned>& gamma, double BetaBV, double BetaS);
+    TVL0DecompositionMinimizer(const std::vector<unsigned>& alpha, double BetaBV, double BetaS);
 
     /**
      * \brief		Destructor.
@@ -82,12 +80,6 @@ public:
     const std::vector<cv::Mat> getOutputsComplete() const;
 
 	/**
-	 * \brief		Getter for gamma.
-	 * \return		Gamma_.
-	 */
-	const std::vector<unsigned>& getGamma() const;
-
-	/**
 	 * \brief		Getter for BetaS.
 	 * \return	    BetaS.
 	 */
@@ -117,11 +109,6 @@ private:
      * look-up table for alpha_i values, i.e. possible values for BV image.
      */
     const std::vector<unsigned> Alpha_;
-
-    /**
-     * look-up table for gamma_i values, i.e. possible values for S image.
-     */
-    const std::vector<unsigned> Gamma_;
 
     /**
      * Stores the last bounded variations images computed

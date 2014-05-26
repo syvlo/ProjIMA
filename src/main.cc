@@ -43,18 +43,6 @@ int main (int argc, char* argv[])
 														schemesNormal));
 
 
-    //Gamma definition (labels for S image).
-    std::vector<unsigned> gamma;
-    for (unsigned i = 0; i < 10000; i += 100)
-    {
-		gamma.push_back(i);
-    }
-    for (unsigned i = 10000; i < 100000; i += 1000)
-    {
-		gamma.push_back(i);
-    }
-
-
 	std::vector<cv::Mat> inputs;
 	const std::vector<char*> inputsNames = args.getInputImages();;
 
@@ -73,17 +61,17 @@ int main (int argc, char* argv[])
 
 	if (args.getDataTerm() == RAYLEIGH)
 	{
-		Engine<RayleighDataTerm2Vars<unsigned, unsigned> > engine (alpha, gamma);
+		Engine<RayleighDataTerm2Vars<unsigned, unsigned> > engine (alpha);
 		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
 	}
 	else if (args.getDataTerm() == RICE)
 	{
-		Engine<RiceDataTerm<unsigned, unsigned> > engine (alpha, gamma);
+		Engine<RiceDataTerm<unsigned, unsigned> > engine (alpha);
 		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
 	}
 	else if (args.getDataTerm() == LOG)
 	{
-		Engine<LogDataTerm<unsigned, unsigned> > engine (alpha, gamma);
+		Engine<LogDataTerm<unsigned, unsigned> > engine (alpha);
 		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
 	}
 
