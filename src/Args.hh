@@ -22,11 +22,6 @@
 # define DEFAULT_BS (42)
 
 /**
- * Default value for WindowMode.
- */
-# define DEFAULT_WINDOW_MODE (false)
-
-/**
  * Default value for RadarMode
  */
 # define DEFAULT_RADAR_MODE (false)
@@ -100,8 +95,7 @@ public:
 
     /**
      * \brief		Check consistency among parsed arguments.
-     * \details		Check, if we are not in window mode, that filenames
-     *			for images are specified (cannot work otherwise...).
+     * \details		that filenames for images are set.
      */
     bool checkConsistency() const;
 
@@ -148,12 +142,6 @@ public:
      * \return		OutputImageComplete.
      */
     const char* getOutputImageComplete() const;
-
-    /**
-     * \brief		Getter for window mode option.
-     * \return		WindowMode.
-     */
-    bool getWindowMode() const;
 
     /**
      * \brief		Getter for radar mode option.
@@ -246,11 +234,6 @@ private:
      *			stored.
      */
     char* OutputImageComplete_;
-
-    /**
-     * \brief		Boolean to defines if a GUI should be used.
-     */
-    bool WindowMode_;
 
     /**
      * \brief		Boolean to defines if radar mode or plain grey level.

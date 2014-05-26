@@ -11,7 +11,6 @@ Args::Args (int argc, char* argv[])
     OutputImageComplete_ = NULL;
     BetaS_ = DEFAULT_BBV;
     BetaBV_ = DEFAULT_BS;
-    WindowMode_ = DEFAULT_WINDOW_MODE;
     RadarMode_ = DEFAULT_RADAR_MODE;
     NonOptimalMode_ = DEFAULT_NON_OPTIMAL_MODE;
 	ComputeWindowSize_ = DEFAULT_COMPUTE_WINDOW_SIZE;
@@ -47,8 +46,6 @@ Args::Args (int argc, char* argv[])
 	    OutputImageComplete_ = new char[strlen(argv[++i]) + 1];
 	    std::strcpy(OutputImageComplete_, argv[i]);
 	}
-	else if (!strcmp("-w", argv[i]) || !strcmp("--Window", argv[i]))
-	    WindowMode_ = true;
 	else if (!strcmp("-r", argv[i]) || !strcmp("--Radar", argv[i]))
 	    RadarMode_ = true;
 	else if (!strcmp("-no", argv[i]) || !strcmp("--NonOptimal", argv[i]))
@@ -119,7 +116,6 @@ Args::Args(const Args& other)
 	OutputImageComplete_ = new char[std::strlen(other.OutputImageComplete_)
 									+ 1];
 	std::strcpy(OutputImageComplete_, other.OutputImageComplete_);
-	WindowMode_ = other.WindowMode_;
 	RadarMode_ = other.RadarMode_;
 	NonOptimalMode_ = other.NonOptimalMode_;
 	ComputeWindowSize_ = other.ComputeWindowSize_;
@@ -133,7 +129,7 @@ Args::Args(const Args& other)
 bool
 Args::checkConsistency() const
 {
-    if (!WindowMode_ && (InputImages_.empty() || !OutputImageBV_ || !OutputImageS_))
+    if (InputImages_.empty() || !OutputImageBV_ || !OutputImageS_)
 		return false;
     return true;
 }
@@ -153,7 +149,6 @@ Args::printHelp() const
 			  << "* -oBV/--OutputImageBV <value>, image to store the Bounded Variations;" << std::endl
 			  << "* -oS/--OutputImageS <value>, image to store the scatterers;" << std::endl
 			  << "* -oC/--OutputImageComplete <value>, image to store the denoised image;" << std::endl
-			  << "* -w/--Window, switch to window mode;" << std::endl
 			  << "* -r/--Radar, switch to radar mode (so no need to pu exts at the end of files names);" << std::endl
 			  << "* -no/--NonOptimal, switch to non optimal mode (for large images.)" << std::endl
 			  << "* -cw/--ComputeWindow, size of the window used for computations in non optimal mode." << std::endl
@@ -203,12 +198,6 @@ const char*
 Args::getOutputImageComplete() const
 {
     return OutputImageComplete_;
-}
-
-bool
-Args::getWindowMode() const
-{
-    return WindowMode_;
 }
 
 bool
@@ -282,7 +271,6 @@ operator<< (std::ostream& stream, const Args& args)
 	stream << "OutputImageS = " << args.OutputImageS_ << "," << std::endl;
     if (args.OutputImageComplete_)
 	stream << "OutputImageComplete = " << args.OutputImageComplete_ << "," << std::endl;
-    stream << "Window Mode = " << args.WindowMode_ << std::endl;
     stream << "Radar Mode = " << args.RadarMode_ << std::endl;
     stream << "One BV, several S = " << args.OneBVSeveralS_ << std::endl;
 	stream << "Non optimal Mode = " << args.NonOptimalMode_;
