@@ -39,7 +39,7 @@ Engine<Minimizer>::Compute(const std::vector<cv::Mat>& Inputs,
 		{
 			ComputeByPartsLinear<TVL0DecompositionMinimizer<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), TVL0);
 
-			computer.compute(Inputs);
+			computer.compute(Inputs, 30);
 
 			OutputsBV = computer.getOutputsBV();
 			OutputsS = computer.getOutputsS();

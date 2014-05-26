@@ -21,12 +21,16 @@ ComputeByPartsLinear<Minimizer>::~ComputeByPartsLinear()
 
 template <typename Minimizer>
 bool
-ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
+ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs, const double sigma)
 {
 	if (inputs.size() == 0)
 		return false;
 
-	cv::Mat numberOfOverlapped = cv::Mat::zeros(inputs[0].size(), CV_8U);
+	cv::Mat weights = cv::Mat::zeros(inputs[0].size(), CV_64F);
+	unsigned kernelSize = (fillSize_ % 2 == 1 ? fillSize_ : fillSize_ + 1);
+	cv::Mat Tmpkernel = cv::getGaussianKernel(kernelSize, sigma);
+	cv::Mat kernel = Tmpkernel * Tmpkernel.t();
+	kernel *= 100 / kernel.at<double>(kernelSize / 2 - 1, kernelSize / 2 - 1);
 
 	std::vector<cv::Mat> TmpOutputsBV;
 	std::vector<cv::Mat> TmpOutputsS;
@@ -44,9 +48,8 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 			//We will do the mean with intesity values for SAR (rather than
 			//amplitude), so we need to have a much bigger type than 16bits.
 
-			//We use CV_32S because CV_32U is not available...
-			TmpOutputsBV.push_back(cv::Mat(inputs[0].size(), CV_32S));
-			TmpOutputsS.push_back(cv::Mat(inputs[0].size(), CV_32S));
+			TmpOutputsBV.push_back(cv::Mat(inputs[0].size(), CV_64F));
+			TmpOutputsS.push_back(cv::Mat(inputs[0].size(), CV_64F));
 
 			OutputsBV_.push_back(cv::Mat(inputs[0].size(), CV_16U));
 			OutputsS_.push_back(cv::Mat(inputs[0].size(), CV_16U));
@@ -60,6 +63,8 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 		for (unsigned j = 0; j < inputs[0].size().width - fillSize_;
 			 j += shiftSize_)
 		{
+			std::cout << i << " " << j << std::endl;
+
 			int endi = i + computeSize_;
 			if (endi >= inputs[0].size().height)
 				endi = inputs[0].size().height - 1;
@@ -103,17 +108,26 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 					{
 						for (int tmp_j = startJFill; tmp_j <= endJFill; ++tmp_j)
 						{
-							numberOfOverlapped.at<unsigned char>(tmp_i, tmp_j) += 1;
+							double weight = kernel.at<double>(tmp_i - startIFill, tmp_j - startJFill);
+							weights.at<double>(tmp_i, tmp_j) += weight;
 
 							if (inputs[0].type() == CV_8U)
 							{
-								OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) = OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) + OBV[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
-								OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) = OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) + OS[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+								OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) = OutputsBV_[img_i].at<unsigned char>(tmp_i, tmp_j) + weight * OBV[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
+								OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) = OutputsS_[img_i].at<unsigned char>(tmp_i, tmp_j) + weight * OS[img_i].at<unsigned char>(tmp_i - i, tmp_j - j);
 							}
 							else
 							{
-								TmpOutputsBV[img_i].at<int>(tmp_i, tmp_j) = TmpOutputsBV[img_i].at<int>(tmp_i, tmp_j) + pow(OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j), 2);
-								TmpOutputsS[img_i].at<int>(tmp_i, tmp_j) = TmpOutputsS[img_i].at<int>(tmp_i, tmp_j) + pow(OS[img_i].at<unsigned short>(tmp_i - i, tmp_j - j), 2);
+								TmpOutputsBV[img_i].at<double>(tmp_i, tmp_j) = TmpOutputsBV[img_i].at<double>(tmp_i, tmp_j) + weight * pow(OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j), 2);
+								if (tmp_i == 80 && tmp_j == 80)
+								{
+									std::cout << "Poids = " << weight << std::endl;
+									std::cout << "Value = " << TmpOutputsBV[img_i].at<double>(tmp_i, tmp_j) << std::endl
+											  << "OBV = " << OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j) << std::endl
+											  << "Poids fois carré = " << weight * pow(OBV[img_i].at<unsigned short>(tmp_i - i, tmp_j - j), 2) << std::endl;
+								}
+
+								TmpOutputsS[img_i].at<double>(tmp_i, tmp_j) = TmpOutputsS[img_i].at<double>(tmp_i, tmp_j) + weight * pow(OS[img_i].at<unsigned short>(tmp_i - i, tmp_j - j), 2);
 							}
 						}
 					}
@@ -126,6 +140,9 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 		}
     }
 
+	std::cout << "Total = " << weights.at<double>(80, 80) << std::endl;
+	std::cout << "Before: " << TmpOutputsBV[0].at<double>(80, 80) << std::endl;
+
 	for (unsigned i_img = 0; i_img < inputs.size(); ++i_img)
 	{
 		for (int i = 0; i < inputs[0].size().height; ++i)
@@ -134,16 +151,16 @@ ComputeByPartsLinear<Minimizer>::compute(const std::vector<cv::Mat> inputs)
 			{
 				if (inputs[0].type() == CV_8U)
 				{
-					OutputsBV_[i_img].at<unsigned char>(i, j) /= numberOfOverlapped.at<unsigned char>(i, j);
-					OutputsS_[i_img].at<unsigned char>(i, j) /= numberOfOverlapped.at<unsigned char>(i, j);
+					OutputsBV_[i_img].at<unsigned char>(i, j) /= weights.at<double>(i, j);
+					OutputsS_[i_img].at<unsigned char>(i, j) /= weights.at<double>(i, j);
 					OutputsC_[i_img].at<unsigned char>(i, j) = OutputsBV_[i_img].at<unsigned char>(i, j) + OutputsS_[i_img].at<unsigned char>(i, j);
 				}
 				else
 				{
-					OutputsBV_[i_img].at<unsigned short>(i, j) = sqrt(TmpOutputsBV[i_img].at<int>(i, j)
-																	  / numberOfOverlapped.at<unsigned char>(i, j));
-					OutputsS_[i_img].at<unsigned short>(i, j) = sqrt(TmpOutputsS[i_img].at<int>(i, j)
-																	 / numberOfOverlapped.at<unsigned char>(i, j));
+					OutputsBV_[i_img].at<unsigned short>(i, j) = sqrt(TmpOutputsBV[i_img].at<double>(i, j)
+																	  / weights.at<double>(i, j));
+					OutputsS_[i_img].at<unsigned short>(i, j) = sqrt(TmpOutputsS[i_img].at<double>(i, j)
+																	 / weights.at<double>(i, j));
 					OutputsC_[i_img].at<unsigned short>(i, j) = OutputsBV_[i_img].at<unsigned short>(i, j)
 						+ OutputsS_[i_img].at<unsigned short>(i, j);
 				}
