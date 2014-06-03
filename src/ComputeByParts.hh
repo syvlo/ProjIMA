@@ -48,9 +48,12 @@ public:
 	 * \brief Method that split the image in blocks and find the optimum
 	 *			on each one of them.
 	 * \param	inputs	The input images.
+	 * \param   oneBVSeveralS return one BV image representing all images and one S.
+	 * \param   doMean if true, the BV image is computed by doing a mean, else
+	 *			by a sum of the dataterms.
 	 * \return	true if everything went OK, false otherwise.
 	 */
-    bool compute(const std::vector<cv::Mat> inputs, bool oneBVSeveralS);
+    bool compute(const std::vector<cv::Mat> inputs, bool oneBVSeveralS, bool doMean);
 
 	/**
 	 * \brief Return the Bounded variations images.

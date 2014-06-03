@@ -3,6 +3,7 @@
 
 # include "Engine.hh"
 # include "TVL0DecompositionMinimizer.hh"
+# include "TVL0DecompositionMinimizerOneBVSeveralS.hh"
 # include "ComputeByParts.hh"
 # include "ComputeByPartsLinear.hh"
 
@@ -28,26 +29,29 @@ Engine<Minimizer>::Compute(const std::vector<cv::Mat>& Inputs,
 						   std::vector<cv::Mat>& OutputsC,
 						   const Args& args)
 {
-	TVL0DecompositionMinimizer<Minimizer> TVL0 (alpha_,
-												args.getBetaBV(),
-												args.getBetaS());
-	if (args.getNonOptimalMode())
+	if (args.getOneBVSeveralS())
 	{
-		if (args.getShiftWindow() != args.getFillingWindowSize())
+		TVL0DecompositionMinimizerOneBVSeveralS<Minimizer> TVL0 (alpha_,
+																 args.getBetaBV(),
+																 args.getBetaS());
+
+		if (args.getNonOptimalMode())
 		{
-			ComputeByPartsLinear<TVL0DecompositionMinimizer<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), TVL0);
-
-			computer.compute(Inputs, 30);
-
-			OutputsBV = computer.getOutputsBV();
-			OutputsS = computer.getOutputsS();
-			OutputsC = computer.getOutputsC();
-		}
-		else
+			if (args.getShiftWindow() != args.getFillingWindowSize())
 			{
-				ComputeByParts<TVL0DecompositionMinimizer<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), TVL0);
+				ComputeByPartsLinear<TVL0DecompositionMinimizerOneBVSeveralS<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), TVL0);
 
-				computer.compute(Inputs, args.getOneBVSeveralS());
+				computer.compute(Inputs, 30);
+
+				OutputsBV = computer.getOutputsBV();
+				OutputsS = computer.getOutputsS();
+				OutputsC = computer.getOutputsC();
+			}
+			else
+			{
+				ComputeByParts<TVL0DecompositionMinimizerOneBVSeveralS<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), TVL0);
+
+				computer.compute(Inputs, args.getOneBVSeveralS(), false);
 
 				OutputsBV = computer.getOutputsBV();
 				OutputsS = computer.getOutputsS();
@@ -62,6 +66,44 @@ Engine<Minimizer>::Compute(const std::vector<cv::Mat>& Inputs,
 			OutputsS = TVL0.getOutputsS();
 			OutputsC = TVL0.getOutputsComplete();
 		}
+	}
+	else
+	{
+		TVL0DecompositionMinimizer<Minimizer> TVL0 (alpha_,
+													args.getBetaBV(),
+													args.getBetaS());
+		if (args.getNonOptimalMode())
+		{
+			if (args.getShiftWindow() != args.getFillingWindowSize())
+			{
+				ComputeByPartsLinear<TVL0DecompositionMinimizer<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), args.getShiftWindow(), TVL0);
+
+				computer.compute(Inputs, 30);
+
+				OutputsBV = computer.getOutputsBV();
+				OutputsS = computer.getOutputsS();
+				OutputsC = computer.getOutputsC();
+			}
+			else
+			{
+				ComputeByParts<TVL0DecompositionMinimizer<Minimizer > > computer(args.getComputeWindowSize(), args.getFillingWindowSize(), TVL0);
+
+				computer.compute(Inputs, args.getOneBVSeveralS(), true);
+
+				OutputsBV = computer.getOutputsBV();
+				OutputsS = computer.getOutputsS();
+				OutputsC = computer.getOutputsC();
+			}
+		}
+		else
+		{
+			TVL0.compute(Inputs);
+
+			OutputsBV = TVL0.getOutputsBV();
+			OutputsS = TVL0.getOutputsS();
+			OutputsC = TVL0.getOutputsComplete();
+		}
+	}
 }
 
 template <typename Minimizer>

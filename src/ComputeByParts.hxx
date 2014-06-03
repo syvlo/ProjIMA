@@ -19,7 +19,8 @@ ComputeByParts<Minimizer>::~ComputeByParts()
 template <typename Minimizer>
 bool
 ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs,
-								   bool oneBVSeveralS)
+								   bool oneBVSeveralS,
+								   bool doMean)
 {
 	if (inputs.size() == 0)
 		return false;
@@ -50,7 +51,7 @@ ComputeByParts<Minimizer>::compute(const std::vector<cv::Mat> inputs,
 
 			cv::Rect ComputeRegion(j, i, endj - j, endi - i);
 			std::vector<cv::Mat> inputsCropped;
-			if (oneBVSeveralS) //We do a mean in intensity.
+			if (oneBVSeveralS && doMean) //We do a mean in intensity.
 			{
 				inputsCropped.push_back(cv::Mat(cv::Size(endj - j, endi - i), CV_16U));
 
