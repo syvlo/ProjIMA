@@ -7,11 +7,12 @@ set ( SRC_DIR "src" )
 set ( BIN_DIR "bin" )
 
 find_package( OpenCV REQUIRED )
-include_directories(/Path/to/libSAR/include/)
+include_directories(/cal/homes/lobry/Programs/include/)
 
 add_executable(${BIN_DIR}/Denoise
   ${SRC_DIR}/main.cc
   ${SRC_DIR}/Args.cc
+  ${SRC_DIR}/utils.cc
   ${SRC_DIR}/maxflow/graph.cpp
   ${SRC_DIR}/maxflow/maxflow.cpp
 )
