@@ -42,7 +42,6 @@ int main (int argc, char* argv[])
 														schemesRadar :
 														schemesNormal));
 
-
 	std::vector<cv::Mat> inputs;
 	const std::vector<char*> inputsNames = args.getInputImages();;
 
@@ -72,6 +71,11 @@ int main (int argc, char* argv[])
 	else if (args.getDataTerm() == LOG)
 	{
 		Engine<LogDataTerm<unsigned, unsigned> > engine (alpha);
+		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
+	}
+	else if (args.getDataTerm() == GAUSSIAN)
+	{
+		Engine<QuadraticDataTerm<unsigned, unsigned> > engine (alpha);
 		engine.Compute(inputs, OutputsBV, OutputsS, OutputsC, args);
 	}
 

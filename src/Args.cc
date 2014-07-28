@@ -67,12 +67,15 @@ Args::Args (int argc, char* argv[])
 			dataterm_ = RAYLEIGH;
 		else if (!strcmp("Log", argv[i]))
 			dataterm_ = LOG;
+		else if (!strcmp("Gaussian", argv[i]))
+			dataterm_ = GAUSSIAN;
 		else
 			std::cerr << "Did not understood value for dataterm." << std::endl
 					  << "Possible values are:" << std::endl
 					  << " * Rice" << std::endl
 					  << " * Rayleigh" << std::endl
-					  << " * Log" << std::endl;
+					  << " * Log" << std::endl
+					  << " * Gaussian" << std::endl;
 	}
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
@@ -143,6 +146,7 @@ Args::printHelp() const
 			  << "  * Rice" << std::endl
 			  << "  * Rayleigh" << std::endl
 			  << "  * Log" << std::endl
+			  << "  * Gaussian" << std::endl
 			  << "* -BBV/--BetaBV <value>, BetaBV;" << std::endl
 			  << "* -BS/--BetaS <value>, BetaS;" << std::endl
 			  << "* -i/--InputImage <value>, image to be denoised. You can add several images by repeating argument." << std::endl
@@ -256,6 +260,8 @@ operator<< (std::ostream& stream, const Args& args)
 		stream << "Rayleigh";
 	else if (args.dataterm_ == LOG)
 		stream << "Log";
+	else if (args.dataterm_ == GAUSSIAN)
+		stream << "Gaussian";
 	stream << "," << std::endl;
 
 	unsigned i = 0;

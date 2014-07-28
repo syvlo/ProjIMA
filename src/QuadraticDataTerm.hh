@@ -25,9 +25,10 @@ public:
 	 * \param	BetaS				Value for the L0 parameter.
      * \return  The value for the data term.
      */
-    static Output Compute(const Input& ObservedValue,
+    static double Compute(const Input& ObservedValue,
 						  const Input& RegularizedValue,
-						  const double BetaS);
+						  const double BetaS,
+						  const double BetaBV);
     /**
      * \brief Method to compute The sparse component.
      * \param	ObservedValue		Observed value (i.e. y_s).
@@ -37,7 +38,21 @@ public:
      */
     static Output ComputeUs(const Input& ObservedValue,
 							const Input& RegularizedValue,
-							const double BetaS);
+							const double BetaS,
+							const double BetaBV);
+
+	/**
+	 * \brief	Given an Us compute the data term.
+	 * \param   ObservedValue			The observed value.
+	 * \param	RegularizedValue		Regularized value chosen.
+	 * \param	Us						The value chosen for Us.
+	 * \param	BetaBV					Regularization parameter for TV.
+	 */
+    static double ComputeDataTermOnly(const Input& ObservedValue,
+									  const Input& RegularizedValue,
+									  const Input& Us,
+									  const double BetaBV);
+
 };
 
 #include "QuadraticDataTerm.hxx"

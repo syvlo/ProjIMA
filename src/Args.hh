@@ -63,7 +63,8 @@ typedef enum
 {
 	RICE, /**< Use Rice dataterm. */
 	RAYLEIGH, /**< Use Rayleigh dataterm. */
-	LOG /**< Use Fisher-Tippet dataterm */
+	LOG, /**< Use Fisher-Tippet dataterm */
+	GAUSSIAN /**< Use Gaussian dataterm */
 } DataTerm;
 
 /**
