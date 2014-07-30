@@ -135,7 +135,6 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					for (unsigned level = 1; level <= nbAlpha; ++level)
 					{
 						g->add_edge(nodes[current + (level -1) * nbPix],
-									//Ou + Height comme dans TP ?
 									nodes[current + (level - 1) * nbPix  - offset_img],
 									beta,
 									beta);
@@ -144,8 +143,12 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 		}
 	}
 
+	std::clog << "Max flow computation:" << std::flush;
     //Computation of max flow.
-    g->maxflow();
+    double MaxFlowValue = g->maxflow();
+	std::clog << " done." << std::endl
+		      << "Value = " << MaxFlowValue << std::endl;
+
 
     //Construction of the output images.
 	for (unsigned i_img = 0; i_img < nbImages; ++ i_img)
@@ -190,10 +193,10 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					{
 						if (type == CV_8U)
 						{
-							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level];
+							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level + 1];
 							OutputsS_[i_img].at<unsigned char>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
-													Alpha_[level], BetaS_, BetaBV_);
+													Alpha_[level + 1], BetaS_, BetaBV_);
 							OutputsComplete_[i_img].at<unsigned char>(i, j) =
 								OutputsBV_[i_img].at<unsigned char>(i, j)
 								+ OutputsS_[i_img].at<unsigned char>(i, j);

@@ -34,7 +34,11 @@ RayleighDataTerm2Vars<Input,Output>::ComputeDataTermOnly(const Input& V,
 						const Input& Us,
 						const double BetaBV)
 {
-	return (((double)V * (double)V) / (((double)Us + (double)Ubv) * ((double)Us + (double)Ubv)) + 2 * log((double)Ubv + (double)Us)) / BetaBV;
+	double dV = (double)V;
+	double dUs = (double)Us;
+	double dUbv = (double)Ubv;
+
+	return ((dV * dV) / ((dUs + dUbv) * (dUs + dUbv)) + 2 * log(dUbv + dUs)) / BetaBV;
 }
 
 template <typename Input, typename Output>
