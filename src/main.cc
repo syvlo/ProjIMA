@@ -33,7 +33,7 @@ int main (int argc, char* argv[])
     // Alpha definition (labels for BV image). //
     /////////////////////////////////////////////
 	//Define schemes. Each scheme is {minVal, maxVal, step}.
-	std::vector<misc::Scheme> schemesRadar {{0, 800, 40}, {800, 3000, 100}};
+	std::vector<misc::Scheme> schemesRadar {{0, 800, 25}, {800, 3000, 100}};
 	std::vector<misc::Scheme> schemesNormal {{0, 255, 1}};
 	//Construct alpha from schemes.
     std::vector<unsigned> alpha = misc::constructAlpha(args.getRadarMode(),
@@ -41,6 +41,9 @@ int main (int argc, char* argv[])
 													   (args.getRadarMode() ?
 														schemesRadar :
 														schemesNormal));
+	//Avoid div by 0
+	if (args.getRadarMode() && alpha[0] == 0)
+		alpha[0] = 1;
 
 	std::vector<cv::Mat> inputs;
 	const std::vector<char*> inputsNames = args.getInputImages();;
