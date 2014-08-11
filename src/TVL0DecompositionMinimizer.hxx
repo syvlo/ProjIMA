@@ -203,7 +203,7 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 						}
 						else
 						{
-							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level];
+							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level + 1];
 							OutputsS_[i_img].at<unsigned short>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
 													Alpha_[level], BetaS_, BetaBV_);
