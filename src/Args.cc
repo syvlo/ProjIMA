@@ -18,6 +18,10 @@ Args::Args (int argc, char* argv[])
 	ShiftWindow_ = DEFAULT_SHIFT_WINDOW;
 	OneBVSeveralS_ = DEFAULT_ONE_BV_SEVERAL_S;
 	dataterm_ = DEFAULT_DATATERM;
+	QPFilenameInput_ = NULL;
+	QPFilenameOutput_= NULL;
+	QPNbLevels_ = DEFAULT_QP_NB_LEVELS;
+	QPPercentage_ = DEFAULT_QP_PERCENTAGE;
     Help_ = false;
 
     for (int i = 1; i < argc; ++i)
@@ -77,6 +81,20 @@ Args::Args (int argc, char* argv[])
 					  << " * Log" << std::endl
 					  << " * Gaussian" << std::endl;
 	}
+	else if (!strcmp("-QPI", argv[i]) || !strcmp("--QuantificationProfileInput", argv[i]))
+	{
+	    QPFilenameInput_ = new char[strlen(argv[++i]) + 1];
+	    std::strcpy(QPFilenameInput_, argv[i]);
+	}
+	else if (!strcmp("-QPO", argv[i]) || !strcmp("--QuantificationProfileOutput", argv[i]))
+	{
+	    QPFilenameOutput_ = new char[strlen(argv[++i]) + 1];
+	    std::strcpy(QPFilenameOutput_, argv[i]);
+	}
+	else if (!strcmp("-QPNL", argv[i]) || !strcmp("--QuantificationProfileNbLevels", argv[i]))
+	    QPNbLevels_ = atoi(argv[++i]);
+	else if (!strcmp("-QPP", argv[i]) || !strcmp("--QuantificationProfilePercentage", argv[i]))
+	    QPPercentage_ = atof(argv[++i]);
 	else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
 	{
 	    printHelp();
@@ -127,6 +145,12 @@ Args::Args(const Args& other)
 	OneBVSeveralS_ = other.OneBVSeveralS_;
 	dataterm_ = other.dataterm_;
 	Help_ = other.Help_;
+	QPFilenameInput_ = new char[std::strlen(other.QPFilenameInput_) + 1];
+	std::strcpy(QPFilenameInput_, other.QPFilenameInput_);
+	QPFilenameOutput_ = new char[std::strlen(other.QPFilenameOutput_) + 1];
+	std::strcpy(QPFilenameOutput_, other.QPFilenameOutput_);
+	QPNbLevels_ = other.QPNbLevels_;
+	QPPercentage_ = other.QPPercentage_;
 }
 
 bool
@@ -158,7 +182,11 @@ Args::printHelp() const
 			  << "* -cw/--ComputeWindow, size of the window used for computations in non optimal mode." << std::endl
 			  << "* -fw/--FillingWindow, size of the window used for filling in non optimal mode." << std::endl
 			  << "* -sw/--ShiftWindow, shift of the window in non optimal mode." << std::endl
-			  << "* -1BVSS/--OneBVSeveralS, switch for the OneBVSeveralS computation.;" << std::endl
+			  << "* -1BVSS/--OneBVSeveralS, switch for the OneBVSeveralS computation." << std::endl
+			  << "* -QPI/--QuantificationProfileInput, Input filename for quantification." << std::endl
+			  << "* -QPO/--QuantificationProfileOutput, Output filename for quantification." << std::endl
+			  << "* -QPNL/--QuantificationProfileNbLevels, number of levels in quantification." << std::endl
+			  << "* -QPP/--QuantificationProfilePercentage, percentage of histogram used in quantification." << std::endl
 			  << "* -h/--help, print this message;" << std::endl;
 }
 
@@ -246,6 +274,29 @@ Args::getDataTerm() const
 	return dataterm_;
 }
 
+char*
+Args::getQPFilenameInput() const
+{
+	return QPFilenameInput_;
+}
+
+char*
+Args::getQPFilenameOutput() const
+{
+	return QPFilenameOutput_;
+}
+
+unsigned
+Args::getQPNbLevels() const
+{
+	return QPNbLevels_;
+}
+
+double
+Args::getQPPercentage() const
+{
+	return QPPercentage_;
+}
 
 
 std::ostream&
@@ -279,7 +330,7 @@ operator<< (std::ostream& stream, const Args& args)
 	stream << "OutputImageComplete = " << args.OutputImageComplete_ << "," << std::endl;
     stream << "Radar Mode = " << args.RadarMode_ << std::endl;
     stream << "One BV, several S = " << args.OneBVSeveralS_ << std::endl;
-	stream << "Non optimal Mode = " << args.NonOptimalMode_;
+	stream << "Non optimal Mode = " << args.NonOptimalMode_ << std::endl;;
 	if (args.NonOptimalMode_)
 	{
 		stream << std::endl << "Compute window size = "
@@ -287,6 +338,21 @@ operator<< (std::ostream& stream, const Args& args)
 		stream << "Filling window size = "
 			   << args.FillingWindowSize_ << std::endl;
 		stream << "Shift for the window = " << args.ShiftWindow_;
+	}
+	if (args.QPFilenameInput_ != NULL)
+	{
+		stream << "Quantification profile input = " << args.QPFilenameInput_
+			   << std::endl;
+	}
+	else
+	{
+		stream << "Quantification profile - nbLevels = " << args.QPNbLevels_ << std::endl;
+		stream << "Quantification profile - Perecentage = " << args.QPPercentage_ << std::endl;
+	}
+	if (args.QPFilenameOutput_ != NULL)
+	{
+		stream << "Quantification profile output = " << args.QPFilenameOutput_
+			   << std::endl;
 	}
 
     return stream;

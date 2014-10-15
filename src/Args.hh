@@ -52,9 +52,19 @@
 # define DEFAULT_ONE_BV_SEVERAL_S (false)
 
 /**
- * Default value for dataterm_;
+ * Default value for dataterm_.
  */
 # define DEFAULT_DATATERM (RAYLEIGH)
+
+/**
+ * Default value for QPNbLevels_.
+ */
+# define DEFAULT_QP_NB_LEVELS (100)
+
+/**
+ * Default value for QPPercentage_.
+ */
+# define DEFAULT_QP_PERCENTAGE (.95)
 
 /**
  * \brief Enum to represent the dataterm to be used.
@@ -186,6 +196,30 @@ public:
 	 */
 	DataTerm getDataTerm () const;
 
+	/**
+	 * \brief	    Getter for the Input filename for quantification profile.
+	 * \return		The quantification profile input filename.
+	 */
+	char* getQPFilenameInput() const;
+
+	/**
+	 * \brief	    Getter for the Output filename for quantification profile.
+	 * \return		The quantification profile output filename.
+	 */
+	char* getQPFilenameOutput() const;
+
+	/**
+	 * \brief	    Getter for the number of levels in quantification.
+	 * \return	    The number of levels in quantification.
+	 */
+	unsigned getQPNbLevels() const;
+
+	/**
+	 * \brief	    Getter for the percentage of histogram to be used in quantification.
+	 * \return	    The percentage of histogram to be used in quantification.
+	 */
+	double getQPPercentage() const;
+
     /**
      * \brief		Getter for Help_ bool.
      * \return		Help_;
@@ -276,6 +310,26 @@ private:
      * \brief		Boolean to defines if help was called.
      */
     bool Help_;
+
+	/**
+	 * \brief		Input filename for quantification profile.
+	 */
+	char* QPFilenameInput_;
+
+	/**
+	 * \brief		Output filename for quantification profile.
+	 */
+	char* QPFilenameOutput_;
+
+	/**
+	 * \brief       Number of levels for quantification.
+	 */
+	unsigned QPNbLevels_;
+
+	/**
+	 * \brief		Percentage of the histogram to quantify.
+	 */
+	double QPPercentage_;
 
     //We do not want to be able to initialize an empty arguments instance.
     Args();

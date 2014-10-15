@@ -13,6 +13,7 @@
 #include "LogDataTerm.hh"
 #include "Engine.hh"
 #include "utils.hh"
+#include "AlphaBuilder.hh"
 
 int main (int argc, char* argv[])
 {
@@ -29,22 +30,6 @@ int main (int argc, char* argv[])
 
     std::cout << args << std::endl;
 
-    /////////////////////////////////////////////
-    // Alpha definition (labels for BV image). //
-    /////////////////////////////////////////////
-	//Define schemes. Each scheme is {minVal, maxVal, step}.
-	std::vector<misc::Scheme> schemesRadar {{0, 800, 25}, {800, 3000, 100}};
-	std::vector<misc::Scheme> schemesNormal {{0, 255, 1}};
-	//Construct alpha from schemes.
-    std::vector<unsigned> alpha = misc::constructAlpha(args.getRadarMode(),
-													   args.getDataTerm(),
-													   (args.getRadarMode() ?
-														schemesRadar :
-														schemesNormal));
-	//Avoid div by 0
-	if (args.getRadarMode() && alpha[0] == 0)
-		alpha[0] = 1;
-
 	std::vector<cv::Mat> inputs;
 	const std::vector<char*> inputsNames = args.getInputImages();;
 
@@ -56,6 +41,10 @@ int main (int argc, char* argv[])
 		else
 			inputs.push_back(ReadImw(*it));
 	}
+
+	AlphaBuilder builder(args);
+	std::vector <unsigned> alpha = builder.getQuantificationVector();
+
 
 	std::vector<cv::Mat> OutputsBV;
 	std::vector<cv::Mat> OutputsS;

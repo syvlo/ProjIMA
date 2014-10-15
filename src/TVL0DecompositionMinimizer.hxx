@@ -143,11 +143,8 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 		}
 	}
 
-	std::clog << "Max flow computation:" << std::flush;
     //Computation of max flow.
-    double MaxFlowValue = g->maxflow();
-	std::clog << " done." << std::endl
-		      << "Value = " << MaxFlowValue << std::endl;
+	g->maxflow();
 
 
     //Construction of the output images.
