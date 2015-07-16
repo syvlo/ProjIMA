@@ -81,20 +81,19 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 				g->add_tweights(nodes[current], 0, INFTY);
 
 				//Every level (except last one) is linked to the one above it.
-				for (unsigned level = 1; level < nbAlpha; ++level)
+				for (unsigned level = 0; level < nbAlpha-1; ++level)
 				{
 					if (type == CV_8U)
-						g->add_edge(nodes[current + (level - 1) * nbPix],
-									nodes[current + level * nbPix],
+						g->add_edge(nodes[current + (level) * nbPix],
+									nodes[current + (level + 1) * nbPix],
 									INFTY,
 									DataTerm::Compute(inputs[i_img].at<unsigned char>(i, j), Alpha_[level], BetaS_, BetaBV_));
 					else
-						g->add_edge(nodes[current + (level - 1) * nbPix],
-									nodes[current + level * nbPix],
+						g->add_edge(nodes[current + (level) * nbPix],
+									nodes[current + (level + 1) * nbPix],
 									INFTY,
 									DataTerm::Compute(inputs[i_img].at<unsigned short>(i, j), Alpha_[level],  BetaS_, BetaBV_));
 				}
-
 				//Last one is linked to the source
 				if (type == CV_8U)
 					g->add_tweights(nodes[current + (nbAlpha - 1) * nbPix],
@@ -124,7 +123,6 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					for (unsigned level = 1; level <= nbAlpha; ++level)
 					{
 						g->add_edge(nodes[current + (level - 1) * nbPix],
-									//Ou + Height comme dans TP ?
 									nodes[current + (level - 1) * nbPix + Width],
 									beta,
 									beta);
@@ -190,17 +188,17 @@ TVL0DecompositionMinimizer<DataTerm>::compute(const std::vector<cv::Mat> inputs)
 					{
 						if (type == CV_8U)
 						{
-							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level + 1];
+							OutputsBV_[i_img].at<unsigned char>(i, j) = Alpha_[level];
 							OutputsS_[i_img].at<unsigned char>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned char>(i, j),
-													Alpha_[level + 1], BetaS_, BetaBV_);
+													Alpha_[level], BetaS_, BetaBV_);
 							OutputsComplete_[i_img].at<unsigned char>(i, j) =
 								OutputsBV_[i_img].at<unsigned char>(i, j)
 								+ OutputsS_[i_img].at<unsigned char>(i, j);
 						}
 						else
 						{
-							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level + 1];
+							OutputsBV_[i_img].at<unsigned short>(i, j) = Alpha_[level];
 							OutputsS_[i_img].at<unsigned short>(i, j) =
 								DataTerm::ComputeUs(inputs[i_img].at<unsigned short>(i, j),
 													Alpha_[level], BetaS_, BetaBV_);
